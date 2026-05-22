@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 7 · Iteration &amp; Search</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e1117;--surface:#161b22;--surface2:#1c2230;--border:#2a3140;
+  --text:#e2e8f0;--text-dim:#8b95a8;--accent:#60d0a0;--accent2:#4db8ff;
+  --accent3:#f0a060;--danger:#ff6b6b;--code-bg:#1a1f2e;
+  --radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);
+  line-height:1.7;min-height:100vh;
+}
+/* grain overlay */
+body::before{
+  content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
+  opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Header */
+.header{
+  padding:60px 40px 40px;text-align:center;position:relative;
+  background:linear-gradient(165deg,#0f1620 0%,#14202e 50%,#101820 100%);
+  border-bottom:1px solid var(--border);overflow:hidden;
+}
+.header::after{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle at 60% 80%,rgba(96,208,160,.06) 0%,transparent 50%),
+             radial-gradient(circle at 30% 20%,rgba(77,184,255,.05) 0%,transparent 40%);
+  pointer-events:none;
+}
+.header h1{
+  font-family:'DM Serif Display',serif;font-size:clamp(2rem,5vw,3.2rem);
+  color:var(--accent);position:relative;z-index:1;letter-spacing:-.02em;
+}
+.header .subtitle{
+  font-size:1.05rem;color:var(--text-dim);margin-top:8px;position:relative;z-index:1;
+}
+.chapter-num{
+  display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.8rem;
+  color:var(--accent3);background:rgba(240,160,96,.1);padding:4px 14px;
+  border-radius:20px;margin-bottom:16px;position:relative;z-index:1;
+  border:1px solid rgba(240,160,96,.2);letter-spacing:.1em;text-transform:uppercase;
+}
+
+/* Navigation */
+.nav{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:20px 24px;
+  border-bottom:1px solid var(--border);background:var(--surface);
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);
+}
+.nav button{
+  font-family:'Source Sans 3',sans-serif;font-size:.85rem;font-weight:600;
+  padding:8px 18px;border:1px solid var(--border);border-radius:8px;
+  background:transparent;color:var(--text-dim);cursor:pointer;transition:.2s;
+}
+.nav button:hover{border-color:var(--accent);color:var(--accent)}
+.nav button.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+
+/* Layout */
+.container{max-width:900px;margin:0 auto;padding:24px 20px 80px}
+
+/* Sections */
+.section{display:none;animation:fadeUp .4s ease}
+.section.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.topic-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:32px;margin-bottom:28px;position:relative;overflow:hidden;
+}
+.topic-card::before{
+  content:'';position:absolute;top:0;left:0;width:4px;height:100%;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:4px 0 0 4px;
+}
+.topic-card h2{
+  font-family:'DM Serif Display',serif;font-size:1.55rem;color:var(--accent);
+  margin-bottom:12px;
+}
+.topic-card h3{
+  font-family:'Source Sans 3',sans-serif;font-size:1.1rem;font-weight:700;
+  color:var(--accent2);margin:20px 0 8px;
+}
+.topic-card p{color:var(--text);margin-bottom:12px}
+.topic-card ul{padding-left:20px;margin-bottom:12px}
+.topic-card li{color:var(--text-dim);margin-bottom:6px}
+.topic-card li strong{color:var(--text)}
+
+pre{
+  background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
+  padding:16px 20px;overflow-x:auto;margin:12px 0;font-size:.88rem;
+  font-family:'JetBrains Mono',monospace;color:#c9d1d9;line-height:1.6;
+}
+code{font-family:'JetBrains Mono',monospace;font-size:.88em}
+.inline-code{
+  background:var(--code-bg);padding:2px 8px;border-radius:4px;
+  border:1px solid var(--border);color:var(--accent2);font-size:.88em;
+}
+
+.keyword{color:#ff7b72}.string{color:#a5d6ff}.comment{color:#6a737d;font-style:italic}
+.func{color:#d2a8ff}.builtin{color:#79c0ff}.num{color:#f0a060}
+
+.output-box{
+  background:#111820;border-left:3px solid var(--accent3);border-radius:0 8px 8px 0;
+  padding:10px 16px;margin:8px 0 12px;font-family:'JetBrains Mono',monospace;
+  font-size:.85rem;color:var(--accent3);
+}
+
+/* Quiz */
+.quiz-card{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:28px;margin-bottom:20px;
+}
+.quiz-card .q-label{
+  font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--accent);
+  text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;
+}
+.quiz-card .q-text{font-size:1.05rem;font-weight:600;margin-bottom:16px}
+.quiz-card .options{display:flex;flex-direction:column;gap:8px}
+.quiz-card .option{
+  padding:12px 16px;border:1px solid var(--border);border-radius:8px;
+  cursor:pointer;transition:.2s;font-size:.95rem;position:relative;
+}
+.quiz-card .option:hover{border-color:var(--accent);background:rgba(96,208,160,.05)}
+.quiz-card .option.correct{border-color:var(--accent);background:rgba(96,208,160,.12);color:var(--accent)}
+.quiz-card .option.wrong{border-color:var(--danger);background:rgba(255,107,107,.1);color:var(--danger)}
+.quiz-card .option.disabled{pointer-events:none;opacity:.7}
+.quiz-card .explanation{
+  margin-top:14px;padding:12px 16px;border-radius:8px;font-size:.9rem;
+  display:none;line-height:1.6;
+}
+.quiz-card .explanation.show{display:block}
+.quiz-card .explanation.correct-exp{background:rgba(96,208,160,.08);border:1px solid rgba(96,208,160,.2);color:var(--accent)}
+.quiz-card .explanation.wrong-exp{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);color:var(--danger)}
+
+/* Add Question Form */
+.add-form{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:32px;margin-top:32px;
+}
+.add-form h3{
+  font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--accent3);margin-bottom:20px;
+}
+.form-group{margin-bottom:16px}
+.form-group label{
+  display:block;font-size:.85rem;font-weight:600;color:var(--text-dim);
+  margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;
+}
+.form-group input,.form-group textarea,.form-group select{
+  width:100%;padding:10px 14px;background:var(--code-bg);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-family:'Source Sans 3',sans-serif;
+  font-size:.95rem;outline:none;transition:.2s;
+}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:60px}
+.option-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.option-row input[type="text"]{flex:1}
+.option-row input[type="radio"]{accent-color:var(--accent);width:18px;height:18px}
+.btn{
+  font-family:'Source Sans 3',sans-serif;font-weight:600;padding:12px 28px;
+  border:none;border-radius:8px;cursor:pointer;font-size:.95rem;transition:.2s;
+}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-primary:hover{background:#4fc090;transform:translateY(-1px)}
+.btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text-dim)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+
+.score-bar{
+  display:flex;align-items:center;gap:16px;padding:16px 20px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:24px;
+}
+.score-bar .score-label{font-weight:600;color:var(--text-dim);font-size:.9rem}
+.score-bar .score-val{font-family:'JetBrains Mono',monospace;font-size:1.3rem;color:var(--accent)}
+.score-bar .reset-btn{
+  margin-left:auto;font-size:.8rem;padding:6px 14px;
+  border:1px solid var(--border);border-radius:6px;background:transparent;
+  color:var(--text-dim);cursor:pointer;font-family:'Source Sans 3',sans-serif;
+}
+.score-bar .reset-btn:hover{border-color:var(--danger);color:var(--danger)}
+
+@media(max-width:600px){
+  .header{padding:40px 20px 28px}
+  .topic-card,.quiz-card,.add-form{padding:20px}
+  .nav{gap:6px;padding:12px 16px}
+  .nav button{font-size:.78rem;padding:6px 12px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="chapter-num">Chapter 7</span>
+  <h1>Iteration &amp; Search</h1>
+  <p class="subtitle">Loops, strings, counters, the <code>in</code> operator, and the linear search pattern</p>
+</div>
+
+<div class="nav" id="nav">
+  <button class="active" onclick="showSection('loops')">Loops &amp; Strings</button>
+  <button onclick="showSection('files')">Reading Files</button>
+  <button onclick="showSection('update')">Updating Variables</button>
+  <button onclick="showSection('search')">Search &amp; <code>in</code></button>
+  <button onclick="showSection('doctest')">Doctest</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div class="container">
+
+<!-- SECTION: Loops & Strings -->
+<div class="section active" id="sec-loops">
+  <div class="topic-card">
+    <h2>Loops and Strings</h2>
+    <p>A <code class="inline-code">for</code> loop iterates through each character in a string, assigning it to a <strong>loop variable</strong>.</p>
+<pre><span class="keyword">for</span> letter <span class="keyword">in</span> <span class="string">'Gadsby'</span>:
+    <span class="builtin">print</span>(letter, end=<span class="string">' '</span>)</pre>
+    <div class="output-box">G a d s b y</div>
+
+    <h3>Building a checker function</h3>
+    <p>We can encapsulate a loop into a reusable function. Here's <code class="inline-code">has_e</code> — it returns <code class="inline-code">True</code> if a word contains the letter "e":</p>
+<pre><span class="keyword">def</span> <span class="func">has_e</span>(word):
+    <span class="keyword">for</span> letter <span class="keyword">in</span> word:
+        <span class="keyword">if</span> letter == <span class="string">'E'</span> <span class="keyword">or</span> letter == <span class="string">'e'</span>:
+            <span class="keyword">return</span> <span class="builtin">True</span>
+    <span class="keyword">return</span> <span class="builtin">False</span></pre>
+
+    <h3>Key Insight</h3>
+    <p>The first <code class="inline-code">return</code> is <em>inside</em> the loop — it exits immediately when a match is found. The second <code class="inline-code">return</code> is <em>outside</em> — it runs only after the entire loop finishes without finding a match. Placing both returns inside the loop is a common bug!</p>
+  </div>
+</div>
+
+<!-- SECTION: Reading Files -->
+<div class="section" id="sec-files">
+  <div class="topic-card">
+    <h2>Reading the Word List</h2>
+    <p>Use the built-in <code class="inline-code">open()</code> function to get a <strong>file object</strong>, then iterate over its lines:</p>
+<pre>file_object = <span class="builtin">open</span>(<span class="string">'words.txt'</span>)
+line = file_object.<span class="func">readline</span>()   <span class="comment"># returns 'aa\n'</span></pre>
+
+    <h3>Methods</h3>
+    <p>A <strong>method</strong> is a function associated with an object, called using <em>dot notation</em>. <code class="inline-code">readline()</code> is a method on the file object; <code class="inline-code">strip()</code> is a method on strings.</p>
+
+<pre><span class="comment"># strip() removes whitespace from both ends</span>
+word = line.<span class="func">strip</span>()   <span class="comment"># 'aah\n' → 'aah'</span></pre>
+
+    <h3>Looping through a file</h3>
+<pre><span class="keyword">for</span> line <span class="keyword">in</span> <span class="builtin">open</span>(<span class="string">'words.txt'</span>):
+    word = line.<span class="func">strip</span>()
+    <span class="builtin">print</span>(word)</pre>
+    <p>Each iteration reads the next line. The file object tracks its position automatically.</p>
+  </div>
+</div>
+
+<!-- SECTION: Updating Variables -->
+<div class="section" id="sec-update">
+  <div class="topic-card">
+    <h2>Updating Variables &amp; Counting</h2>
+    <p>An <strong>update</strong> assigns a new value that depends on the old value. You must <strong>initialize</strong> a variable before updating it.</p>
+<pre>x = <span class="num">5</span>
+x = x + <span class="num">1</span>    <span class="comment"># increment</span>
+x += <span class="num">2</span>       <span class="comment"># augmented assignment — same as x = x + 2</span></pre>
+
+    <h3>Counter pattern</h3>
+    <p>A <strong>counter</strong> is a variable initialized to 0, then incremented inside a loop:</p>
+<pre>total = <span class="num">0</span>
+count = <span class="num">0</span>
+
+<span class="keyword">for</span> line <span class="keyword">in</span> <span class="builtin">open</span>(<span class="string">'words.txt'</span>):
+    word = line.<span class="func">strip</span>()
+    total += <span class="num">1</span>
+    <span class="keyword">if</span> <span class="func">has_e</span>(word):
+        count += <span class="num">1</span></pre>
+    <div class="output-box">total = 113783 &nbsp;|&nbsp; count = 76162 &nbsp;|&nbsp; ~66.9% of words contain 'e'</div>
+  </div>
+</div>
+
+<!-- SECTION: Search & in -->
+<div class="section" id="sec-search">
+  <div class="topic-card">
+    <h2>The <code class="inline-code">in</code> Operator &amp; Linear Search</h2>
+    <p>Python's <code class="inline-code">in</code> operator checks membership — whether a character appears in a string:</p>
+<pre><span class="string">'e'</span> <span class="keyword">in</span> <span class="string">'Gadsby'</span>   <span class="comment"># False</span>
+<span class="string">'e'</span> <span class="keyword">in</span> <span class="string">'Emma'</span>     <span class="comment"># True</span></pre>
+
+    <h3>Simplified <code class="inline-code">has_e</code></h3>
+<pre><span class="keyword">def</span> <span class="func">has_e</span>(word):
+    <span class="keyword">return</span> <span class="string">'e'</span> <span class="keyword">in</span> word.<span class="func">lower</span>()</pre>
+    <p>The <code class="inline-code">lower()</code> method returns a new lowercase copy of the string — the original is unchanged.</p>
+
+    <h3>Linear Search — <code class="inline-code">uses_any</code></h3>
+<pre><span class="keyword">def</span> <span class="func">uses_any</span>(word, letters):
+    <span class="keyword">for</span> letter <span class="keyword">in</span> word.<span class="func">lower</span>():
+        <span class="keyword">if</span> letter <span class="keyword">in</span> letters.<span class="func">lower</span>():
+            <span class="keyword">return</span> <span class="builtin">True</span>
+    <span class="keyword">return</span> <span class="builtin">False</span></pre>
+    <p>This pattern — looping through elements, checking each, and returning early on a match — is called a <strong>linear search</strong>.</p>
+  </div>
+</div>
+
+<!-- SECTION: Doctest -->
+<div class="section" id="sec-doctest">
+  <div class="topic-card">
+    <h2>Testing with Doctest</h2>
+    <p>A <strong>docstring</strong> can include executable tests. Lines starting with <code class="inline-code">&gt;&gt;&gt;</code> are treated as expressions; the following line is the expected result.</p>
+<pre><span class="keyword">def</span> <span class="func">uses_any</span>(word, letters):
+    <span class="string">"""Checks if a word uses any of a list of letters.
+    
+    &gt;&gt;&gt; uses_any('banana', 'aeiou')
+    True
+    &gt;&gt;&gt; uses_any('apple', 'xyz')
+    False
+    """</span>
+    <span class="keyword">for</span> letter <span class="keyword">in</span> word.<span class="func">lower</span>():
+        <span class="keyword">if</span> letter <span class="keyword">in</span> letters.<span class="func">lower</span>():
+            <span class="keyword">return</span> <span class="builtin">True</span>
+    <span class="keyword">return</span> <span class="builtin">False</span></pre>
+
+    <h3>Running tests</h3>
+<pre><span class="keyword">from</span> doctest <span class="keyword">import</span> run_docstring_examples
+
+<span class="keyword">def</span> <span class="func">run_doctests</span>(func):
+    run_docstring_examples(func, <span class="builtin">globals</span>(), name=func.__name__)</pre>
+    <p>If all tests <strong>pass</strong>, no output is shown. A <strong>failure</strong> prints the expected vs. actual value so you can debug.</p>
+  </div>
+</div>
+
+<!-- SECTION: Quiz -->
+<div class="section" id="sec-quiz">
+
+  <div class="score-bar">
+    <span class="score-label">Score</span>
+    <span class="score-val" id="scoreDisplay">0 / 0</span>
+    <button class="reset-btn" onclick="resetQuiz()">Reset</button>
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <!-- Add question form -->
+  <div class="add-form">
+    <h3>➕ Add Your Own Question</h3>
+    <div class="form-group">
+      <label>Question</label>
+      <textarea id="newQ" placeholder="Type your question here…"></textarea>
+    </div>
+    <div id="optionFields">
+      <div class="form-group"><label>Options (select the correct one)</label></div>
+      <div class="option-row">
+        <input type="radio" name="correctOpt" value="0" checked>
+        <input type="text" id="opt0" placeholder="Option A">
+      </div>
+      <div class="option-row">
+        <input type="radio" name="correctOpt" value="1">
+        <input type="text" id="opt1" placeholder="Option B">
+      </div>
+      <div class="option-row">
+        <input type="radio" name="correctOpt" value="2">
+        <input type="text" id="opt2" placeholder="Option C">
+      </div>
+      <div class="option-row">
+        <input type="radio" name="correctOpt" value="3">
+        <input type="text" id="opt3" placeholder="Option D">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Explanation (shown after answering)</label>
+      <textarea id="newExpl" placeholder="Why is this the correct answer?"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="addQuestion()">Add Question</button>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ── Navigation ──
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  window.scrollTo({top:0});
+}
+
+// ── Quiz Data ──
+const defaultQuestions = [
+  {
+    q: "What is a variable defined in the header of a for loop called?",
+    opts: ["Counter", "Loop variable", "Iterator object", "Index"],
+    correct: 1,
+    expl: "A variable defined in a for loop header (e.g. `for letter in word`) is called a loop variable."
+  },
+  {
+    q: "What does the strip() method do when called on a string?",
+    opts: ["Removes all spaces", "Removes the last character", "Removes whitespace from both ends", "Converts to lowercase"],
+    correct: 2,
+    expl: "strip() removes whitespace characters — spaces, tabs, and newlines — from the beginning and end of a string."
+  },
+  {
+    q: "What is the output of: 'e' in 'Gadsby'",
+    opts: ["True", "False", "Error", "None"],
+    correct: 1,
+    expl: "'Gadsby' has no lowercase 'e', so the `in` operator returns False."
+  },
+  {
+    q: "In uses_any, what happens if the second return False is placed inside the else block of the loop?",
+    opts: ["It works the same", "It returns False after checking only the first letter", "It causes a syntax error", "It returns None"],
+    correct: 1,
+    expl: "Placing return False inside an else makes the function return after checking only the first character, instead of checking all characters."
+  },
+  {
+    q: "What does x += 3 do?",
+    opts: ["Sets x to 3", "Increments x by 3", "Multiplies x by 3", "Compares x with 3"],
+    correct: 1,
+    expl: "+= is an augmented assignment operator. x += 3 is equivalent to x = x + 3."
+  },
+  {
+    q: "What is the purpose of initializing a counter variable to 0 before a loop?",
+    opts: ["It's optional style", "Python requires it for type checking", "You can't update a variable that doesn't exist yet", "It makes the loop faster"],
+    correct: 2,
+    expl: "Python evaluates the right side of an assignment before assigning. If z doesn't exist, z = z + 1 raises a NameError."
+  },
+  {
+    q: "In a doctest, what does the >>> prefix indicate?",
+    opts: ["A comment", "An expression to evaluate", "Expected output", "A decorator"],
+    correct: 1,
+    expl: "Lines starting with >>> in a docstring are treated as Python expressions. The next line shows the expected result."
+  },
+  {
+    q: "What pattern does uses_any implement?",
+    opts: ["Binary search", "Linear search", "Bubble sort", "Recursion"],
+    correct: 1,
+    expl: "uses_any loops through elements one by one and returns early when a match is found — this is a linear search."
+  }
+];
+
+let questions = [...defaultQuestions];
+let answered = {};
+let correctCount = 0;
+
+function renderQuiz() {
+  const c = document.getElementById('quizContainer');
+  c.innerHTML = '';
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'quiz-card';
+    card.id = 'qcard-'+i;
+    let optsHTML = q.opts.map((o,j) =>
+      `<div class="option" data-q="${i}" data-o="${j}" onclick="selectAnswer(${i},${j})">${o}</div>`
+    ).join('');
+    card.innerHTML = `
+      <div class="q-label">Question ${i+1}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${optsHTML}</div>
+      <div class="explanation" id="expl-${i}">${q.expl}</div>
+    `;
+    c.appendChild(card);
+  });
+  // restore state
+  for (let idx in answered) {
+    applyAnswerState(+idx, answered[idx]);
+  }
+  updateScore();
+}
+
+function selectAnswer(qi, oi) {
+  if (answered[qi] !== undefined) return;
+  answered[qi] = oi;
+  if (oi === questions[qi].correct) correctCount++;
+  applyAnswerState(qi, oi);
+  updateScore();
+}
+
+function applyAnswerState(qi, oi) {
+  const card = document.getElementById('qcard-'+qi);
+  const opts = card.querySelectorAll('.option');
+  opts.forEach((el,j) => {
+    el.classList.add('disabled');
+    if (j === questions[qi].correct) el.classList.add('correct');
+    else if (j === oi && oi !== questions[qi].correct) el.classList.add('wrong');
+  });
+  const expl = document.getElementById('expl-'+qi);
+  expl.classList.add('show');
+  expl.classList.add(oi === questions[qi].correct ? 'correct-exp' : 'wrong-exp');
+}
+
+function updateScore() {
+  const total = Object.keys(answered).length;
+  document.getElementById('scoreDisplay').textContent = correctCount + ' / ' + total;
+}
+
+function resetQuiz() {
+  answered = {};
+  correctCount = 0;
+  renderQuiz();
+}
+
+function addQuestion() {
+  const qText = document.getElementById('newQ').value.trim();
+  const opts = [0,1,2,3].map(i => document.getElementById('opt'+i).value.trim());
+  const correct = +document.querySelector('input[name="correctOpt"]:checked').value;
+  const expl = document.getElementById('newExpl').value.trim();
+
+  if (!qText || opts.some(o => !o)) {
+    alert('Please fill in the question and all four options.');
+    return;
+  }
+  questions.push({q: qText, opts, correct, expl: expl || 'No explanation provided.'});
+  // clear form
+  document.getElementById('newQ').value = '';
+  [0,1,2,3].forEach(i => document.getElementById('opt'+i).value = '');
+  document.getElementById('newExpl').value = '';
+  renderQuiz();
+  // scroll to new question
+  document.getElementById('qcard-'+(questions.length-1)).scrollIntoView({behavior:'smooth'});
+}
+
+renderQuiz();
+</script>
+</body>
+</html>

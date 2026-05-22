@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 1 — Programming as a Way of Thinking</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0f13;
+  --surface: #141820;
+  --surface2: #1a1f2b;
+  --border: #252b3a;
+  --text: #d4dae6;
+  --text-muted: #7a849a;
+  --heading: #f0f2f8;
+  --accent: #f59e42;
+  --accent2: #38bdf8;
+  --accent3: #a78bfa;
+  --green: #4ade80;
+  --red: #fb7185;
+  --code-bg: #0d1117;
+  --code-border: #1e2533;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 400;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* ========== HERO ========== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 600px 400px at 30% 40%, rgba(245,158,66,.12), transparent),
+    radial-gradient(ellipse 500px 500px at 70% 60%, rgba(56,189,248,.08), transparent),
+    radial-gradient(ellipse 400px 300px at 50% 80%, rgba(167,139,250,.06), transparent);
+  pointer-events: none;
+}
+
+.hero-chip {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: .4rem 1.2rem;
+  font-size: .8rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  animation: fadeDown .8s ease both;
+}
+
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  color: var(--heading);
+  line-height: 1.15;
+  max-width: 800px;
+  animation: fadeDown 1s ease both .15s;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-sub {
+  margin-top: 1.5rem;
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  max-width: 540px;
+  animation: fadeDown 1s ease both .3s;
+}
+
+.hero-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  justify-content: center;
+  margin-top: 3rem;
+  animation: fadeDown 1s ease both .5s;
+}
+
+.hero-nav a {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: .55rem 1.2rem;
+  border-radius: 8px;
+  font-size: .85rem;
+  text-decoration: none;
+  transition: all .25s;
+}
+.hero-nav a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(245,158,66,.12);
+}
+
+/* ========== LAYOUT ========== */
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 1.5rem 6rem;
+}
+
+section {
+  padding-top: 5rem;
+}
+
+/* ========== SECTION HEADERS ========== */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 1rem;
+}
+
+.section-label::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  background: var(--accent2);
+  border-radius: 2px;
+}
+
+h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: var(--heading);
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.35rem;
+  color: var(--heading);
+  margin: 2.5rem 0 1rem;
+}
+
+p { margin-bottom: 1.2rem; }
+p + p { margin-top: 0; }
+
+/* ========== CODE BLOCKS ========== */
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 10px;
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--code-border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  color: var(--text-muted);
+  letter-spacing: .05em;
+}
+
+.code-header .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .6;
+}
+
+.code-block pre {
+  padding: 1rem 1.2rem;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .85rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.code-block .prompt { color: var(--accent2); }
+.code-block .output { color: var(--green); }
+.code-block .comment { color: var(--text-muted); font-style: italic; }
+.code-block .string { color: var(--accent); }
+.code-block .error { color: var(--red); }
+.code-block .keyword { color: var(--accent3); }
+
+/* ========== INFO CARDS ========== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: border-color .3s, transform .3s;
+}
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+}
+
+.card-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
+.card-icon.orange { background: rgba(245,158,66,.15); color: var(--accent); }
+.card-icon.blue { background: rgba(56,189,248,.15); color: var(--accent2); }
+.card-icon.purple { background: rgba(167,139,250,.15); color: var(--accent3); }
+.card-icon.green { background: rgba(74,222,128,.15); color: var(--green); }
+
+.card h4 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  color: var(--heading);
+  margin-bottom: .5rem;
+}
+
+.card p {
+  font-size: .9rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ========== TABLE ========== */
+.op-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: .92rem;
+}
+.op-table th, .op-table td {
+  padding: .75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.op-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface);
+}
+.op-table td:first-child {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ========== CALLOUT ========== */
+.callout {
+  border-left: 3px solid var(--accent2);
+  background: rgba(56,189,248,.05);
+  padding: 1.2rem 1.5rem;
+  border-radius: 0 10px 10px 0;
+  margin: 1.5rem 0;
+  font-size: .95rem;
+}
+
+.callout.warn {
+  border-color: var(--accent);
+  background: rgba(245,158,66,.05);
+}
+
+.callout strong {
+  color: var(--heading);
+}
+
+/* ========== COMPARISON COLS ========== */
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+@media (max-width: 600px) {
+  .comparison { grid-template-columns: 1fr; }
+}
+
+.comparison-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.comparison-col h4 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--heading);
+  margin-bottom: .75rem;
+  font-size: 1.1rem;
+}
+
+.comparison-col ul {
+  list-style: none;
+  padding: 0;
+}
+
+.comparison-col li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: .5rem;
+  font-size: .9rem;
+  color: var(--text-muted);
+}
+
+.comparison-col li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent2);
+}
+
+/* ========== GLOSSARY ========== */
+.glossary {
+  display: grid;
+  gap: .6rem;
+  margin: 1.5rem 0;
+}
+
+.glossary-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.3rem;
+  cursor: pointer;
+  transition: border-color .25s;
+}
+.glossary-item:hover { border-color: var(--accent3); }
+
+.glossary-term {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .85rem;
+  color: var(--accent3);
+  font-weight: 600;
+}
+
+.glossary-def {
+  font-size: .88rem;
+  color: var(--text-muted);
+  margin-top: .3rem;
+  line-height: 1.6;
+  display: none;
+}
+
+.glossary-item.open .glossary-def { display: block; }
+
+.glossary-item::after {
+  content: '+';
+  float: right;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  transition: transform .25s;
+}
+.glossary-item.open::after {
+  content: '−';
+}
+
+/* ========== EXERCISES ========== */
+.exercise {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.exercise-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .75rem;
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ========== FOOTER ========== */
+footer {
+  text-align: center;
+  padding: 3rem 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+</style>
+</head>
+<body>
+
+<!-- ======== HERO ======== -->
+<header class="hero">
+  <div class="hero-chip">Chapter 1 · Think Python</div>
+  <h1>Programming as a Way of <em>Thinking</em></h1>
+  <p class="hero-sub">Numbers, strings, operators, and expressions — your first steps into Python and computational reasoning.</p>
+  <nav class="hero-nav">
+    <a href="#operators">Operators</a>
+    <a href="#expressions">Expressions</a>
+    <a href="#functions">Functions</a>
+    <a href="#strings">Strings</a>
+    <a href="#types">Types</a>
+    <a href="#languages">Languages</a>
+    <a href="#debugging">Debugging</a>
+    <a href="#glossary">Glossary</a>
+    <a href="#exercises">Exercises</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <!-- ======== INTRO ======== -->
+  <section class="reveal">
+    <div class="section-label">The Big Idea</div>
+    <h2>Think Like a Computer Scientist</h2>
+    <p>Learning to program is more than memorising syntax — it's acquiring a new way of thinking that blends the best of mathematics, engineering, and natural science.</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon orange">∑</div>
+        <h4>Like Mathematicians</h4>
+        <p>Use formal languages to denote ideas — specifically computations.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon blue">⚙</div>
+        <h4>Like Engineers</h4>
+        <p>Design things, assemble components, evaluate trade-offs among alternatives.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">🔬</div>
+        <h4>Like Scientists</h4>
+        <p>Observe complex systems, form hypotheses, and test predictions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== 1.1 OPERATORS ======== -->
+  <section id="operators" class="reveal">
+    <div class="section-label">1.1</div>
+    <h2>Arithmetic Operators</h2>
+    <p>An arithmetic operator is a symbol that represents an arithmetic computation. Python gives you six key operators out of the box:</p>
+
+    <table class="op-table">
+      <thead>
+        <tr><th>Operator</th><th>Operation</th><th>Example</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>+</td><td>Addition</td><td>30 + 12</td><td>42</td></tr>
+        <tr><td>-</td><td>Subtraction</td><td>43 - 1</td><td>42</td></tr>
+        <tr><td>*</td><td>Multiplication</td><td>6 * 7</td><td>42</td></tr>
+        <tr><td>/</td><td>Division</td><td>84 / 2</td><td>42.0</td></tr>
+        <tr><td>//</td><td>Floor Division</td><td>85 // 2</td><td>42</td></tr>
+        <tr><td>**</td><td>Exponentiation</td><td>7 ** 2</td><td>49</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <strong>Watch out:</strong> In many other languages <code>^</code> means exponentiation, but in Python it's the bitwise XOR operator. <code>7 ^ 2</code> gives <code>5</code>, not <code>49</code>.
+    </div>
+
+    <h3>Integer vs Float Division</h3>
+    <p>Dividing two integers with <code>/</code> always produces a <strong>float</strong>. Use <code>//</code> (floor division) to get an integer result that rounds down.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="dot"></span> Python REPL</div>
+      <pre><span class="prompt">>>></span> 84 / 2
+<span class="output">42.0</span>          <span class="comment"># float result</span>
+
+<span class="prompt">>>></span> 84 // 2
+<span class="output">42</span>           <span class="comment"># integer result (floor division)</span>
+
+<span class="prompt">>>></span> 85 // 2
+<span class="output">42</span>           <span class="comment"># rounds DOWN, not to nearest</span></pre>
+    </div>
+  </section>
+
+  <!-- ======== 1.2 EXPRESSIONS ======== -->
+  <section id="expressions" class="reveal">
+    <div class="section-label">1.2</div>
+    <h2>Expressions</h2>
+    <p>An expression is a combination of operators and values. Python evaluates them following the standard mathematical order of operations — exponentiation first, then multiplication and division, then addition and subtraction.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="dot"></span> Order of Operations</div>
+      <pre><span class="prompt">>>></span> 6 + 6 ** 2       <span class="comment"># exponent first → 6 + 36</span>
+<span class="output">42</span>
+
+<span class="prompt">>>></span> 12 + 5 * 6       <span class="comment"># multiply first → 12 + 30</span>
+<span class="output">42</span>
+
+<span class="prompt">>>></span> (12 + 5) * 6     <span class="comment"># parentheses override → 17 * 6</span>
+<span class="output">102</span></pre>
+    </div>
+
+    <div class="callout">
+      <strong>Key idea:</strong> Every expression has a value. The expression <code>6 * 7</code> has the value <code>42</code>. This is true no matter how complex the expression gets.
+    </div>
+  </section>
+
+  <!-- ======== 1.3 FUNCTIONS ======== -->
+  <section id="functions" class="reveal">
+    <div class="section-label">1.3</div>
+    <h2>Arithmetic Functions</h2>
+    <p>Beyond operators, Python provides built-in functions that work with numbers. When we use a function, we say we're <em>calling</em> it, and the expression is a <em>function call</em>.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon green">≈</div>
+        <h4>round()</h4>
+        <p>Rounds a floating-point number to the nearest integer (or to n decimal places).</p>
+      </div>
+      <div class="card">
+        <div class="card-icon orange">|x|</div>
+        <h4>abs()</h4>
+        <p>Returns the absolute (non-negative) value of a number.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="dot"></span> Function Calls</div>
+      <pre><span class="prompt">>>></span> round(42.4)
+<span class="output">42</span>
+<span class="prompt">>>></span> round(42.6)
+<span class="output">43</span>
+
+<span class="prompt">>>></span> abs(42)
+<span class="output">42</span>
+<span class="prompt">>>></span> abs(-42)
+<span class="output">42</span></pre>
+    </div>
+
+    <div class="callout warn">
+      <strong>Parentheses are required!</strong> Leaving them out causes a SyntaxError. A bare function name like <code>abs</code> is a valid expression — it just evaluates to the function object itself, not a computed result.
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="dot"></span> Common Mistake</div>
+      <pre><span class="prompt">>>></span> abs 42
+<span class="error">SyntaxError: invalid syntax</span>
+
+<span class="prompt">>>></span> abs           <span class="comment"># legal, but just shows the function object</span>
+<span class="output">&lt;function abs(x, /)&gt;</span></pre>
+    </div>
+  </section>
+
+  <!-- ======== 1.4 STRINGS ======== -->
+  <section id="strings" class="reveal">
+    <div class="section-label">1.4</div>
+    <h2>Strings</h2>
+    <p>Python represents sequences of characters as <strong>strings</strong>. You can write them with single or double quotes. They can contain spaces, punctuation, digits — anything textual.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="dot"></span> Creating Strings</div>
+      <pre><span class="prompt">>>></span> <span class="string">'Hello'</span>
+<span class="output">'Hello'</span>
+
+<span class="prompt">>>></span> <span class="string">"it's a small "</span>     <span class="comment"># double quotes let you include apostrophes</span>
+<span class="output">"it's a small "</span></pre>
+    </div>
+
+    <h3>String Operations</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon blue">+</div>
+        <h4>Concatenation</h4>
+        <p>The <code>+</code> operator joins two strings end-to-end into one.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">×</div>
+        <h4>Repetition</h4>
+        <p>The <code>*</code> operator repeats a string multiple times.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon green">len</div>
+        <h4>Length</h4>
+        <p><code>len()</code> returns the number of characters in a string.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="dot"></span> String Operations</div>
+      <pre><span class="prompt">>>></span> <span class="string">'Well, '</span> + <span class="string">"it's a small "</span> + <span class="string">'world.'</span>
+<span class="output">"Well, it's a small world."</span>
+
+<span class="prompt">>>></span> <span class="string">'Spam, '</span> * 4
+<span class="output">'Spam, Spam, Spam, Spam, '</span>
+
+<span class="prompt">>>></span> len(<span class="string">'Spam'</span>)
+<span class="output">4</span></pre>
+    </div>
+
+    <div class="callout warn">
+      <strong>Quote style matters:</strong> Always use straight quotes (<code>'</code> or <code>"</code>). Backticks and smart/curly quotes will cause a SyntaxError.
+    </div>
+  </section>
+
+  <!-- ======== 1.5 TYPES ======== -->
+  <section id="types" class="reveal">
+    <div class="section-label">1.5</div>
+    <h2>Values &amp; Types</h2>
+    <p>Every value in Python has a <strong>type</strong>. The three types we've met so far:</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon orange">42</div>
+        <h4>int</h4>
+        <p>Whole numbers with no decimal part. E.g. <code>2</code>, <code>-7</code>, <code>1_000_000</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon blue">3.14</div>
+        <h4>float</h4>
+        <p>Numbers with a decimal point. E.g. <code>42.0</code>, <code>12.6</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">abc</div>
+        <h4>str</h4>
+        <p>Sequences of characters in quotes. E.g. <code>'Hello'</code>.</p>
+      </div>
+    </div>
+
+    <h3>The <code>type()</code> Function</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="dot"></span> Checking Types</div>
+      <pre><span class="prompt">>>></span> type(2)
+<span class="output">&lt;class 'int'&gt;</span>
+
+<span class="prompt">>>></span> type(42.0)
+<span class="output">&lt;class 'float'&gt;</span>
+
+<span class="prompt">>>></span> type(<span class="string">'Hello, World!'</span>)
+<span class="output">&lt;class 'str'&gt;</span></pre>
+    </div>
+
+    <h3>Type Conversion</h3>
+    <p>The type names <code>int</code>, <code>float</code>, and <code>str</code> also serve as conversion functions:</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="dot"></span> Converting Between Types</div>
+      <pre><span class="prompt">>>></span> int(42.9)         <span class="comment"># float → int (truncates, doesn't round)</span>
+<span class="output">42</span>
+
+<span class="prompt">>>></span> float(42)         <span class="comment"># int → float</span>
+<span class="output">42.0</span>
+
+<span class="prompt">>>></span> int(<span class="string">'126'</span>) / 3    <span class="comment"># string → int, then divide</span>
+<span class="output">42.0</span></pre>
+    </div>
+
+    <div class="callout warn">
+      <strong>A common trap:</strong> Digits inside quotes are strings, not numbers. <code>'126' / 3</code> throws a <code>TypeError</code>. Convert first with <code>int()</code> or <code>float()</code>.
+    </div>
+
+    <div class="callout">
+      <strong>Large numbers:</strong> Don't use commas — <code>1,000,000</code> becomes a tuple <code>(1, 0, 0)</code>. Use underscores instead: <code>1_000_000</code>.
+    </div>
+  </section>
+
+  <!-- ======== 1.6 LANGUAGES ======== -->
+  <section id="languages" class="reveal">
+    <div class="section-label">1.6</div>
+    <h2>Formal vs Natural Languages</h2>
+    <p>Programming languages are <strong>formal languages</strong> — designed by people for specific purposes. They differ from natural languages (English, Telugu, French) in important ways:</p>
+
+    <div class="comparison">
+      <div class="comparison-col">
+        <h4>Natural Languages</h4>
+        <ul>
+          <li>Full of ambiguity — rely on context</li>
+          <li>Redundant and verbose</li>
+          <li>Rich in idiom and metaphor</li>
+          <li>Evolved naturally over time</li>
+        </ul>
+      </div>
+      <div class="comparison-col">
+        <h4>Formal Languages</h4>
+        <ul>
+          <li>Designed to be unambiguous</li>
+          <li>Concise and precise</li>
+          <li>Mean exactly what they say</li>
+          <li>Designed by people for specific tasks</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Reading formal languages:</strong> They are denser than natural text. Structure matters — don't always read top-to-bottom. And small errors in spelling or punctuation can completely change meaning.
+    </div>
+  </section>
+
+  <!-- ======== 1.7 DEBUGGING ======== -->
+  <section id="debugging" class="reveal">
+    <div class="section-label">1.7</div>
+    <h2>Debugging</h2>
+    <p>Programming errors are whimsically called <strong>bugs</strong>, and tracking them down is called <strong>debugging</strong>. It can be frustrating, but it's one of the most valuable skills you'll develop.</p>
+
+    <div class="callout">
+      <strong>A good mental model:</strong> Think of the computer as an employee with strengths (speed, precision) and weaknesses (no empathy, no big-picture thinking). Your job is to manage those strengths and weaknesses effectively — and to channel your emotions into engagement, not frustration.
+    </div>
+  </section>
+
+  <!-- ======== 1.8 GLOSSARY ======== -->
+  <section id="glossary" class="reveal">
+    <div class="section-label">1.8</div>
+    <h2>Glossary</h2>
+    <p>Click any term to expand its definition.</p>
+
+    <div class="glossary" id="glossary-list">
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">arithmetic operator</span>
+        <div class="glossary-def">A symbol like <code>+</code> or <code>*</code> that denotes an arithmetic operation.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">integer</span>
+        <div class="glossary-def">A type representing whole numbers with no fractional part.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">floating-point</span>
+        <div class="glossary-def">A type representing numbers that can have a decimal part.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">integer division</span>
+        <div class="glossary-def">The <code>//</code> operator — divides two numbers and rounds down to an integer.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">expression</span>
+        <div class="glossary-def">A combination of values, variables, and operators that Python can evaluate.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">value</span>
+        <div class="glossary-def">A basic unit of data — an integer, float, string, or other data type.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">function</span>
+        <div class="glossary-def">A named sequence of statements that performs an operation. May take arguments and return a result.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">function call</span>
+        <div class="glossary-def">An expression that runs a function — the function name followed by arguments in parentheses.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">syntax error</span>
+        <div class="glossary-def">An error caused by code that violates Python's structural rules, preventing it from running.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">string</span>
+        <div class="glossary-def">A type that represents a sequence of characters, written in quotes.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">concatenation</span>
+        <div class="glossary-def">Joining two strings end-to-end using the <code>+</code> operator.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">type</span>
+        <div class="glossary-def">A category of values — <code>int</code>, <code>float</code>, and <code>str</code> are the types introduced in this chapter.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">operand</span>
+        <div class="glossary-def">A value that an operator acts upon. In <code>3 + 4</code>, both <code>3</code> and <code>4</code> are operands.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">bug</span>
+        <div class="glossary-def">An error in a program.</div>
+      </div>
+      <div class="glossary-item" onclick="this.classList.toggle('open')">
+        <span class="glossary-term">debugging</span>
+        <div class="glossary-def">The process of finding and correcting errors in a program.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== 1.9 EXERCISES ======== -->
+  <section id="exercises" class="reveal">
+    <div class="section-label">1.9</div>
+    <h2>Exercises</h2>
+
+    <div class="exercise">
+      <div class="exercise-num">Exercise 1 — Banker's Rounding</div>
+      <p>What does <code>round(42.5)</code> return? What about <code>round(43.5)</code>? Try both, then figure out the pattern. (Hint: Python uses "round half to even" — also called banker's rounding.)</p>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-num">Exercise 2 — Break Things on Purpose</div>
+      <p>Try these in a Python interpreter and observe the error messages: put a <code>+</code> before a number (<code>+2</code>), try <code>2++2</code>, put two values with no operator (<code>4 2</code>), and call <code>round</code> without parentheses.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-num">Exercise 3 — What's the Type?</div>
+      <p>Predict the type of each expression, then check with <code>type()</code>: <code>765</code>, <code>2.718</code>, <code>'2 pi'</code>, <code>abs(-7)</code>, <code>abs(-7.0)</code>, <code>abs</code>, <code>int</code>, <code>type</code>.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-num">Exercise 4 — Arithmetic Practice</div>
+      <p>Write expressions to answer: How many seconds in 42 minutes 42 seconds? How many miles in 10 km? If you run 10 km in 42:42, what's your pace per mile (in seconds, then in minutes:seconds)? What's your average speed in mph?</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Chapter 1 · Think Python — Programming as a Way of Thinking
+</footer>
+
+<script>
+// Scroll-reveal animation
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

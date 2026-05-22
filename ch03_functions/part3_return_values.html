@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 6 — Return Values in Python</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Literata:ital,wght@0,400;0,600;0,800;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f2;
+    --cream: #f0ece2;
+    --accent: #e07a5f;
+    --accent2: #3d405b;
+    --accent3: #81b29a;
+    --code-bg: #2b2d42;
+    --code-fg: #edf2f4;
+    --highlight: #f2cc8f;
+    --border: #d4cfc4;
+    --shadow: rgba(26,26,46,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Literata', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.75;
+    font-size: 17px;
+  }
+
+  /* --- HERO --- */
+  .hero {
+    background: var(--accent2);
+    color: var(--paper);
+    padding: 80px 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: 'return';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18vw;
+    position: absolute;
+    bottom: -3vw;
+    right: -2vw;
+    opacity: 0.06;
+    font-weight: 600;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .hero-inner { max-width: 780px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero .chapter-label {
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-size: 13px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+  .hero p {
+    font-size: 1.1rem;
+    opacity: 0.82;
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* --- NAV PILLS --- */
+  .toc-bar {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .toc-bar a {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent2);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: all 0.2s;
+    display: inline-block;
+    margin-right: 4px;
+  }
+  .toc-bar a:hover, .toc-bar a.active {
+    background: var(--accent2);
+    color: var(--paper);
+  }
+
+  /* --- MAIN --- */
+  .container { max-width: 780px; margin: 0 auto; padding: 50px 40px 100px; }
+
+  .section { margin-bottom: 60px; scroll-margin-top: 60px; }
+
+  h2 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--accent);
+    display: inline-block;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 28px 0 12px;
+  }
+
+  p { margin-bottom: 16px; }
+
+  /* --- CODE --- */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    padding: 22px 26px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 16px 0 20px;
+    line-height: 1.6;
+    position: relative;
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+  pre .kw { color: #f2cc8f; }
+  pre .fn { color: #81b29a; }
+  pre .str { color: #e07a5f; }
+  pre .num { color: #8ecae6; }
+  pre .cmt { color: #8d99ae; font-style: italic; }
+  pre .op { color: #ef476f; }
+  pre .out {
+    display: block;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #555;
+    color: #adb5bd;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--cream);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: var(--accent2);
+  }
+
+  /* --- CONCEPT CARDS --- */
+  .concept-card {
+    background: white;
+    border-left: 4px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 22px 26px;
+    margin: 20px 0;
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  .concept-card.green { border-left-color: var(--accent3); }
+  .concept-card.gold  { border-left-color: var(--highlight); }
+  .concept-card h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--accent2);
+  }
+
+  /* --- GLOSSARY --- */
+  .glossary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .glossary-item {
+    background: white;
+    border-radius: 10px;
+    padding: 18px 22px;
+    box-shadow: 0 2px 10px var(--shadow);
+    transition: transform 0.2s;
+  }
+  .glossary-item:hover { transform: translateY(-3px); }
+  .glossary-item strong {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* --- EXERCISES --- */
+  .exercise {
+    background: white;
+    border-radius: 12px;
+    padding: 26px 30px;
+    margin: 20px 0;
+    box-shadow: 0 3px 16px var(--shadow);
+    border-top: 4px solid var(--accent3);
+    position: relative;
+  }
+  .exercise .badge {
+    position: absolute;
+    top: -14px;
+    left: 24px;
+    background: var(--accent3);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .exercise.challenge { border-top-color: var(--accent); }
+  .exercise.challenge .badge { background: var(--accent); }
+  .exercise h4 {
+    font-family: 'DM Sans', sans-serif;
+    margin: 6px 0 10px;
+    color: var(--accent2);
+  }
+  .exercise p { margin-bottom: 10px; font-size: 0.97rem; }
+
+  .difficulty {
+    display: inline-block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 10px;
+    margin-top: 8px;
+  }
+  .difficulty.easy { background: #d8f3dc; color: #2d6a4f; }
+  .difficulty.medium { background: #fef3c7; color: #92400e; }
+  .difficulty.hard { background: #fce4ec; color: #b71c1c; }
+
+  /* --- INTERACTIVE TOGGLE --- */
+  .toggle-section {
+    margin-top: 14px;
+  }
+  .toggle-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent2);
+    background: var(--cream);
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toggle-btn:hover { background: var(--accent2); color: white; }
+  .toggle-content {
+    display: none;
+    margin-top: 12px;
+    padding: 16px 20px;
+    background: var(--cream);
+    border-radius: 8px;
+    font-size: 0.95rem;
+  }
+  .toggle-content.open { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+  /* --- FOOTER --- */
+  footer {
+    text-align: center;
+    padding: 40px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #999;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 50px 20px 40px; }
+    .container { padding: 30px 20px 60px; }
+    .toc-bar { padding: 10px 16px; }
+    pre { font-size: 12.5px; padding: 16px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="chapter-label">Chapter 6</div>
+    <h1>Return Values</h1>
+    <p>Learn to write functions that give back results you can store, combine, and build upon — from pure functions and booleans to recursion and input validation.</p>
+  </div>
+</div>
+
+<!-- ===== TOC BAR ===== -->
+<nav class="toc-bar">
+  <a href="#basics">Basics</a>
+  <a href="#none">None</a>
+  <a href="#conditionals">Conditionals</a>
+  <a href="#incremental">Incremental Dev</a>
+  <a href="#boolean">Boolean Fns</a>
+  <a href="#recursion">Recursion</a>
+  <a href="#fibonacci">Fibonacci</a>
+  <a href="#validation">Validation</a>
+  <a href="#glossary">Glossary</a>
+  <a href="#exercises">Exercises</a>
+</nav>
+
+<!-- ===== CONTENT ===== -->
+<div class="container">
+
+  <!-- 6.1 -->
+  <div class="section" id="basics">
+    <h2>6.1 &nbsp;Return Values</h2>
+    <p>Built-in functions like <code>abs()</code> and <code>math.sqrt()</code> produce results you can store in variables or weave into expressions. The <code>return</code> statement lets your own functions do the same.</p>
+
+    <pre><span class="kw">import</span> math
+
+<span class="kw">def</span> <span class="fn">circle_area</span>(radius):
+    area = math.pi * radius**<span class="num">2</span>
+    <span class="kw">return</span> area
+<span class="out">>>> circle_area(5)
+78.53981633974483</span></pre>
+
+    <div class="concept-card">
+      <h4>Key Insight</h4>
+      <p>The variable <code>area</code> is <em>local</em> to the function. Once the function returns, you can't access it from outside — only the returned value survives.</p>
+    </div>
+  </div>
+
+  <!-- 6.2 -->
+  <div class="section" id="none">
+    <h2>6.2 &nbsp;Functions That Return None</h2>
+    <p>If a function has no <code>return</code> statement, it automatically returns the special value <code>None</code>. Functions that use <code>print()</code> to display output still return <code>None</code>.</p>
+
+    <pre><span class="kw">def</span> <span class="fn">repeat</span>(word, n):
+    <span class="fn">print</span>(word * n)
+
+result = <span class="fn">repeat</span>(<span class="str">'Spam, '</span>, <span class="num">3</span>)
+<span class="fn">print</span>(result)
+<span class="out">Spam, Spam, Spam, 
+None</span></pre>
+
+    <div class="concept-card green">
+      <h4>Pure Function</h4>
+      <p>A <strong>pure function</strong> doesn't display anything or cause side effects — it only returns a value. Prefer pure functions when you want composable, testable code.</p>
+    </div>
+
+    <pre><span class="kw">def</span> <span class="fn">repeat_string</span>(word, n):
+    <span class="kw">return</span> word * n   <span class="cmt"># pure — no print!</span>
+
+line = <span class="fn">repeat_string</span>(<span class="str">'Spam, '</span>, <span class="num">4</span>)
+<span class="out">>>> line
+'Spam, Spam, Spam, Spam, '</span></pre>
+  </div>
+
+  <!-- 6.3 -->
+  <div class="section" id="conditionals">
+    <h2>6.3 &nbsp;Return Values &amp; Conditionals</h2>
+    <p>When you place <code>return</code> statements inside conditionals, every possible execution path must hit a <code>return</code>. Otherwise your function can silently return <code>None</code>.</p>
+
+    <pre><span class="cmt"># ✗ Incorrect — misses the case x == 0</span>
+<span class="kw">def</span> <span class="fn">absolute_value_wrong</span>(x):
+    <span class="kw">if</span> x <span class="op"><</span> <span class="num">0</span>:
+        <span class="kw">return</span> -x
+    <span class="kw">if</span> x <span class="op">></span> <span class="num">0</span>:
+        <span class="kw">return</span> x
+    <span class="cmt"># x == 0 falls through → returns None!</span></pre>
+
+    <pre><span class="cmt"># ✓ Correct</span>
+<span class="kw">def</span> <span class="fn">absolute_value</span>(x):
+    <span class="kw">if</span> x <span class="op"><</span> <span class="num">0</span>:
+        <span class="kw">return</span> -x
+    <span class="kw">else</span>:
+        <span class="kw">return</span> x</pre>
+
+    <div class="concept-card gold">
+      <h4>Dead Code</h4>
+      <p>Any code placed <em>after</em> a <code>return</code> statement that always executes is <strong>dead code</strong> — it can never run, and usually signals a misunderstanding.</p>
+    </div>
+  </div>
+
+  <!-- 6.4 -->
+  <div class="section" id="incremental">
+    <h2>6.4 &nbsp;Incremental Development</h2>
+    <p>Build functions in small, testable steps. Start with a stub that returns a placeholder, add one computation at a time, verify with <code>print()</code>, and finally replace scaffolding with clean return statements.</p>
+
+    <pre><span class="cmt"># Step 1 — stub</span>
+<span class="kw">def</span> <span class="fn">distance</span>(x1, y1, x2, y2):
+    <span class="kw">return</span> <span class="num">0.0</span>
+
+<span class="cmt"># Step 2 — compute deltas</span>
+<span class="kw">def</span> <span class="fn">distance</span>(x1, y1, x2, y2):
+    dx = x2 - x1
+    dy = y2 - y1
+    <span class="fn">print</span>(<span class="str">'dx is'</span>, dx, <span class="str">'dy is'</span>, dy)
+    <span class="kw">return</span> <span class="num">0.0</span>
+
+<span class="cmt"># Step 3 — final version</span>
+<span class="kw">def</span> <span class="fn">distance</span>(x1, y1, x2, y2):
+    dx = x2 - x1
+    dy = y2 - y1
+    <span class="kw">return</span> math.<span class="fn">sqrt</span>(dx**<span class="num">2</span> + dy**<span class="num">2</span>)
+<span class="out">>>> distance(1, 2, 4, 6)
+5.0</span></pre>
+
+    <div class="concept-card">
+      <h4>The 3 Rules</h4>
+      <p>① Start with working code, make small changes, test after each. ② Use temporary variables and <code>print()</code> to inspect intermediate values. ③ Remove scaffolding once the function is correct.</p>
+    </div>
+  </div>
+
+  <!-- 6.5 -->
+  <div class="section" id="boolean">
+    <h2>6.5 &nbsp;Boolean Functions</h2>
+    <p>Functions that return <code>True</code> or <code>False</code> are great for encapsulating tests. Since comparison operators already produce booleans, you can return them directly.</p>
+
+    <pre><span class="cmt"># Verbose but clear</span>
+<span class="kw">def</span> <span class="fn">is_divisible</span>(x, y):
+    <span class="kw">if</span> x % y <span class="op">==</span> <span class="num">0</span>:
+        <span class="kw">return</span> <span class="kw">True</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="kw">False</span>
+
+<span class="cmt"># Idiomatic — return the boolean directly</span>
+<span class="kw">def</span> <span class="fn">is_divisible</span>(x, y):
+    <span class="kw">return</span> x % y <span class="op">==</span> <span class="num">0</span>
+<span class="out">>>> is_divisible(6, 3)
+True</span></pre>
+  </div>
+
+  <!-- 6.6 -->
+  <div class="section" id="recursion">
+    <h2>6.6 &nbsp;Recursion with Return Values</h2>
+    <p>Combining recursion with return values unlocks the full power of computation. The classic example is the factorial function, where <em>n!</em> = <em>n</em> × (<em>n</em>−1)!</p>
+
+    <pre><span class="kw">def</span> <span class="fn">factorial</span>(n):
+    <span class="kw">if</span> n <span class="op">==</span> <span class="num">0</span>:
+        <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> n * <span class="fn">factorial</span>(n - <span class="num">1</span>)
+<span class="out">>>> factorial(5)
+120</span></pre>
+
+    <div class="concept-card green">
+      <h4>Leap of Faith</h4>
+      <p>Instead of tracing every recursive call, <em>assume</em> the recursive call returns the correct result, then verify the current step is correct. This mental shortcut makes recursion far easier to reason about.</p>
+    </div>
+  </div>
+
+  <!-- 6.7 -->
+  <div class="section" id="fibonacci">
+    <h2>6.7 &nbsp;Fibonacci</h2>
+    <p>The Fibonacci sequence is defined recursively: <em>fib(0)</em> = 0, <em>fib(1)</em> = 1, and <em>fib(n)</em> = <em>fib(n−1)</em> + <em>fib(n−2)</em>.</p>
+
+    <pre><span class="kw">def</span> <span class="fn">fibonacci</span>(n):
+    <span class="kw">if</span> n <span class="op">==</span> <span class="num">0</span>:
+        <span class="kw">return</span> <span class="num">0</span>
+    <span class="kw">elif</span> n <span class="op">==</span> <span class="num">1</span>:
+        <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="fn">fibonacci</span>(n-<span class="num">1</span>) + <span class="fn">fibonacci</span>(n-<span class="num">2</span>)
+<span class="out">>>> fibonacci(8)
+21</span></pre>
+  </div>
+
+  <!-- 6.8 -->
+  <div class="section" id="validation">
+    <h2>6.8 &nbsp;Input Validation</h2>
+    <p>Guard your recursive functions against bad input. Checking types and value ranges at the top prevents infinite recursion and confusing error messages.</p>
+
+    <pre><span class="kw">def</span> <span class="fn">factorial</span>(n):
+    <span class="kw">if not</span> <span class="fn">isinstance</span>(n, int):
+        <span class="fn">print</span>(<span class="str">'factorial is only defined for integers.'</span>)
+        <span class="kw">return</span> <span class="kw">None</span>
+    <span class="kw">elif</span> n <span class="op"><</span> <span class="num">0</span>:
+        <span class="fn">print</span>(<span class="str">'factorial is not defined for negative numbers.'</span>)
+        <span class="kw">return</span> <span class="kw">None</span>
+    <span class="kw">elif</span> n <span class="op">==</span> <span class="num">0</span>:
+        <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> n * <span class="fn">factorial</span>(n - <span class="num">1</span>)</pre>
+  </div>
+
+  <!-- GLOSSARY -->
+  <div class="section" id="glossary">
+    <h2>Glossary</h2>
+    <div class="glossary-grid">
+      <div class="glossary-item"><strong>return value</strong>The result produced by a function, available as an expression value.</div>
+      <div class="glossary-item"><strong>pure function</strong>A function with no side effects — it only returns a value.</div>
+      <div class="glossary-item"><strong>dead code</strong>Code that can never execute, often found after an unconditional return.</div>
+      <div class="glossary-item"><strong>incremental development</strong>Building programs in small, testable steps.</div>
+      <div class="glossary-item"><strong>scaffolding</strong>Temporary debugging code removed from the final program.</div>
+      <div class="glossary-item"><strong>Turing complete</strong>Capable of expressing any computable algorithm.</div>
+      <div class="glossary-item"><strong>input validation</strong>Checking parameters for correct type and value before proceeding.</div>
+    </div>
+  </div>
+
+  <!-- ===== EXERCISES ===== -->
+  <div class="section" id="exercises">
+    <h2>Practice Exercises</h2>
+
+    <!-- Original exercises -->
+    <div class="exercise">
+      <span class="badge">Exercise 1</span>
+      <h4>Hypotenuse</h4>
+      <p>Use incremental development to write a function called <code>hypot(a, b)</code> that returns the length of the hypotenuse of a right triangle given the other two legs. Do <em>not</em> use <code>math.hypot</code>.</p>
+      <span class="difficulty easy">Easy</span>
+    </div>
+
+    <div class="exercise">
+      <span class="badge">Exercise 2</span>
+      <h4>Is Between?</h4>
+      <p>Write a boolean function <code>is_between(x, y, z)</code> that returns <code>True</code> if <em>x ≤ y ≤ z</em> or <em>z ≤ y ≤ x</em>, and <code>False</code> otherwise.</p>
+      <span class="difficulty easy">Easy</span>
+    </div>
+
+    <div class="exercise">
+      <span class="badge">Exercise 3</span>
+      <h4>Ackermann Function</h4>
+      <p>Write a function <code>ackermann(m, n)</code> that evaluates the Ackermann function. What happens when you call <code>ackermann(5, 5)</code>?</p>
+      <span class="difficulty hard">Hard</span>
+    </div>
+
+    <div class="exercise">
+      <span class="badge">Exercise 4</span>
+      <h4>Greatest Common Divisor</h4>
+      <p>Write a recursive function <code>gcd(a, b)</code> that returns the greatest common divisor using the Euclidean algorithm: if <em>r</em> is the remainder of <em>a ÷ b</em>, then <em>gcd(a, b) = gcd(b, r)</em>. Base case: <em>gcd(a, 0) = a</em>.</p>
+      <span class="difficulty medium">Medium</span>
+    </div>
+
+    <!-- ===== NEW QUESTIONS ===== -->
+    <h3 style="margin-top: 50px; color: var(--accent); border-bottom: 2px dashed var(--accent); display: inline-block; padding-bottom: 4px;">Additional Practice</h3>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 5</span>
+      <h4>Sum of Digits</h4>
+      <p>Write a recursive function <code>sum_digits(n)</code> that takes a non-negative integer and returns the sum of its digits. For example, <code>sum_digits(1234)</code> should return <code>10</code>.</p>
+      <p><em>Hint:</em> <code>n % 10</code> gives the last digit, and <code>n // 10</code> removes it.</p>
+      <span class="difficulty easy">Easy</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 6</span>
+      <h4>Power Function</h4>
+      <p>Write a recursive function <code>power(base, exp)</code> that returns <code>base</code> raised to the power <code>exp</code> (a non-negative integer). Do <em>not</em> use the <code>**</code> operator or <code>math.pow</code>.</p>
+      <p><em>Base case:</em> anything raised to the power 0 is 1.</p>
+      <span class="difficulty easy">Easy</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 7</span>
+      <h4>Palindrome Checker</h4>
+      <p>Write a boolean function <code>is_palindrome(s)</code> that returns <code>True</code> if the string <code>s</code> reads the same forwards and backwards (ignoring case). Use recursion, not slicing tricks.</p>
+      <p><em>Example:</em> <code>is_palindrome('Racecar')</code> → <code>True</code></p>
+      <span class="difficulty medium">Medium</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 8</span>
+      <h4>Flatten a Nested Sum</h4>
+      <p>Write a function <code>nested_sum(lst)</code> that takes a list of lists of numbers and returns the total of all numbers. For example, <code>nested_sum([[1, 2], [3], [4, 5, 6]])</code> should return <code>21</code>.</p>
+      <span class="difficulty easy">Easy</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 9</span>
+      <h4>Collatz Sequence Length</h4>
+      <p>The Collatz conjecture defines a sequence: if <em>n</em> is even, the next value is <em>n / 2</em>; if odd, it's <em>3n + 1</em>. The sequence always (conjectured) reaches 1.</p>
+      <p>Write a function <code>collatz_length(n)</code> that returns the number of steps it takes for <em>n</em> to reach 1. For example, <code>collatz_length(6)</code> → the sequence is 6 → 3 → 10 → 5 → 16 → 8 → 4 → 2 → 1, so the answer is <code>8</code>.</p>
+      <span class="difficulty medium">Medium</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 10</span>
+      <h4>Digital Root</h4>
+      <p>The digital root of a number is found by repeatedly summing its digits until a single digit remains. Write a recursive function <code>digital_root(n)</code> that returns this value.</p>
+      <p><em>Example:</em> <code>digital_root(493)</code> → 4+9+3 = 16 → 1+6 = <code>7</code></p>
+      <p><em>Hint:</em> Reuse your <code>sum_digits</code> function from Exercise 5.</p>
+      <span class="difficulty medium">Medium</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 11</span>
+      <h4>Tower of Hanoi — Count Moves</h4>
+      <p>Write a recursive function <code>hanoi_moves(n)</code> that returns the <em>minimum number of moves</em> needed to solve the Tower of Hanoi puzzle with <em>n</em> disks. Don't just return <code>2**n - 1</code> — derive the answer recursively.</p>
+      <span class="difficulty medium">Medium</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 12</span>
+      <h4>Binary Representation</h4>
+      <p>Write a recursive function <code>to_binary(n)</code> that takes a non-negative integer and returns a <em>string</em> of its binary representation. Do not use Python's built-in <code>bin()</code>.</p>
+      <p><em>Example:</em> <code>to_binary(13)</code> → <code>'1101'</code></p>
+      <span class="difficulty medium">Medium</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 13</span>
+      <h4>Recursive Max</h4>
+      <p>Write a recursive function <code>recursive_max(lst)</code> that returns the largest element in a list of numbers without using the built-in <code>max()</code>. You may assume the list has at least one element.</p>
+      <span class="difficulty medium">Medium</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 14</span>
+      <h4>Luhn Checksum</h4>
+      <p>The Luhn algorithm validates identification numbers (credit cards, etc.). Write a function <code>luhn_check(number_str)</code> that returns <code>True</code> if the number string passes the Luhn checksum.</p>
+      <p><em>Steps:</em> Starting from the rightmost digit, double every second digit. If doubling produces a value > 9, subtract 9. Sum all the digits. If the total is divisible by 10, the number is valid.</p>
+      <span class="difficulty hard">Hard</span>
+    </div>
+
+    <div class="exercise challenge">
+      <span class="badge">Exercise 15</span>
+      <h4>Flatten Deeply Nested Lists</h4>
+      <p>Write a recursive function <code>deep_flatten(lst)</code> that takes an arbitrarily nested list and returns a single flat list of all values.</p>
+      <p><em>Example:</em> <code>deep_flatten([1, [2, [3, 4], [5]], 6])</code> → <code>[1, 2, 3, 4, 5, 6]</code></p>
+      <span class="difficulty hard">Hard</span>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  Chapter 6 — Return Values &nbsp;·&nbsp; Python Study Guide
+</footer>
+
+<script>
+  // Toggle hint/answer sections
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const content = btn.nextElementSibling;
+      content.classList.toggle('open');
+      btn.textContent = content.classList.contains('open') ? 'Hide Hint' : 'Show Hint';
+    });
+  });
+
+  // Active nav pill on scroll
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('.toc-bar a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        const active = document.querySelector(`.toc-bar a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
