@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 13 — Files & Databases | Python Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f5f0e8;
+    --accent: #c0392b;
+    --accent2: #2c3e50;
+    --muted: #8e8e7a;
+    --card-bg: #fffdf7;
+    --code-bg: #2c3e50;
+    --code-fg: #ecf0f1;
+    --tag-bg: #e8dfd0;
+    --shadow: rgba(26,26,46,0.08);
+    --border: #d4cfc4;
+    --green: #27ae60;
+    --highlight: #e6a817;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 3.2rem 2rem 2.8rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.03) 59px, rgba(255,255,255,0.03) 60px),
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.03) 59px, rgba(255,255,255,0.03) 60px);
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+  header h1 span { color: var(--accent); font-style: italic; }
+  header p.subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+    margin-top: 0.8rem;
+    position: relative;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 1rem 1rem;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  nav a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.45rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  section {
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  section:last-of-type { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.6rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .section-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+  }
+
+  h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent2);
+    margin: 1.5rem 0 0.6rem;
+  }
+  p { margin-bottom: 1rem; font-size: 0.95rem; color: #3a3a3a; }
+  strong { color: var(--ink); }
+  ul, ol { margin: 0.8rem 0 1rem 1.8rem; }
+  li { margin-bottom: 0.3rem; font-size: 0.95rem; }
+
+  .concept-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent2);
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 0.9rem;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px var(--shadow);
+  }
+  .concept-card h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent2);
+    margin-bottom: 0.4rem;
+  }
+  .concept-card p { font-size: 0.93rem; margin-bottom: 0.3rem; }
+  .concept-card p:last-child { margin-bottom: 0; }
+
+  .code-block {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    padding: 0.8rem 1rem;
+    border-radius: 3px;
+    overflow-x: auto;
+    margin: 0.6rem 0;
+    white-space: pre;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--tag-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    font-size: 0.87em;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.18rem 0.5rem;
+    background: var(--tag-bg);
+    border-radius: 2px;
+    color: var(--muted);
+  }
+
+  .qa-card {
+    margin-bottom: 0.7rem;
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: 0 1px 5px var(--shadow);
+  }
+  .qa-question {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.75rem 1.2rem;
+    background: #fff8ed;
+    border-left: 4px solid var(--highlight);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .qa-question:hover { background: #fff3dc; }
+  .qa-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    color: var(--highlight);
+    font-size: 0.75rem;
+    min-width: 1.8rem;
+  }
+  .qa-q-text { flex: 1; font-size: 0.92rem; font-weight: 600; color: var(--ink); }
+  .qa-toggle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .qa-chevron { display: inline-block; transition: transform 0.25s ease; margin-right: 0.25rem; }
+  .qa-card.open .qa-chevron { transform: rotate(90deg); }
+  .qa-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    background: #f0f7f0;
+    border-left: 4px solid var(--green);
+    padding: 0 1.2rem;
+  }
+  .qa-card.open .qa-answer {
+    max-height: 500px;
+    padding: 0.9rem 1.2rem;
+  }
+  .qa-answer p { font-size: 0.9rem; color: #2d2d2d; margin-bottom: 0.5rem; }
+  .qa-answer .answer-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--green);
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+  }
+  .qa-answer .code-block { margin: 0.5rem 0; }
+
+  .callout {
+    background: linear-gradient(135deg, rgba(44,62,80,0.06), rgba(192,57,43,0.04));
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.5rem 0;
+    border-left: 4px solid var(--accent);
+  }
+  .callout .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .glossary-list {
+    columns: 2;
+    column-gap: 2.5rem;
+    margin: 1.5rem 0;
+  }
+  .glossary-item { break-inside: avoid; margin-bottom: 1rem; }
+  .glossary-item dt {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    color: var(--accent2);
+    font-weight: 600;
+  }
+  .glossary-item dd {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-top: 0.1rem;
+  }
+
+  .flashcard-section { margin-top: 3rem; }
+  .flashcard-section h3 { color: var(--accent); }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .glossary-list { columns: 1; }
+    nav { gap: 0.3rem; }
+    nav a { font-size: 0.65rem; padding: 0.35rem 0.7rem; }
+    .container { padding: 1.2rem 1rem 3rem; }
+    .section-number { font-size: 1.8rem; }
+    .section-title { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Chapter 13 — <span>Files &amp; Databases</span></h1>
+  <p class="subtitle">Think Python · Complete Study Guide</p>
+</header>
+
+<nav>
+  <a href="#paths">Paths</a>
+  <a href="#fstrings">f-strings</a>
+  <a href="#yaml">YAML</a>
+  <a href="#shelve">Shelve</a>
+  <a href="#hashing">Hashing</a>
+  <a href="#walking">Walking</a>
+  <a href="#debugging">Debugging</a>
+  <a href="#glossary">Glossary</a>
+  <a href="#flashcards">Flashcards</a>
+</nav>
+
+<main class="container">
+
+<!-- ═══════ 13.1 PATHS ═══════ -->
+<section id="paths">
+  <div class="section-header">
+    <span class="section-number">13.1</span>
+    <span class="section-title">Filenames &amp; Paths</span>
+  </div>
+
+  <h3>Current Working Directory</h3>
+  <p>Every running program has a <strong>current working directory</strong>. Use <code>os.getcwd()</code> to find it. This is the default directory for file operations.</p>
+  <div class="code-block">import os
+os.getcwd()  # '/home/dinsdale'</div>
+
+  <h3>Relative vs Absolute Paths</h3>
+  <p>A <strong>relative path</strong> like <code>memo.txt</code> is resolved against the current directory. An <strong>absolute path</strong> starts with <code>/</code> and works regardless of the current directory.</p>
+  <div class="code-block">os.path.abspath('memo.txt')
+# '/home/dinsdale/memo.txt'</div>
+
+  <h3>Listing &amp; Checking Paths</h3>
+  <p><code>os.listdir(dir)</code> returns contents of a directory. <code>os.path.exists()</code> checks existence. <code>os.path.isdir()</code> and <code>os.path.isfile()</code> distinguish directories from files.</p>
+
+  <h3>Cross-Platform Paths</h3>
+  <p>macOS/Linux use <code>/</code> as separator, Windows uses <code>\</code>. Use <code>os.path.join()</code> to build paths that work on any OS.</p>
+  <div class="code-block">os.path.join('photos', 'jan-2023', 'photo1.jpg')
+# 'photos/jan-2023/photo1.jpg'</div>
+
+  <div class="callout">
+    <div class="label">Key Point</div>
+    <p>An <strong>ephemeral</strong> program runs briefly and loses data when it ends. A <strong>persistent</strong> program runs for a long time, keeps data in long-term storage, and can resume where it left off.</p>
+  </div>
+
+  <h3>Questions &amp; Answers</h3>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#1</span>
+      <span class="qa-q-text">What is the difference between an ephemeral and a persistent program?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>Ephemeral programs run briefly and lose data when they end. Persistent programs run for a long time, keep data in long-term storage, and can resume where they left off.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#2</span>
+      <span class="qa-q-text">What does os.getcwd() return?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>It returns the current working directory as a string path, e.g. '/home/dinsdale'.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#3</span>
+      <span class="qa-q-text">What is the difference between a relative path and an absolute path?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>A relative path is relative to the current directory (e.g. 'memo.txt'). An absolute path starts with / and doesn't depend on the current directory (e.g. '/home/dinsdale/memo.txt').</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#4</span>
+      <span class="qa-q-text">What does os.path.join() do and why is it useful?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>It joins directory and file names into a path using the correct separator (/ or \) for the current operating system, making code cross-platform.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 13.2 f-STRINGS ═══════ -->
+<section id="fstrings">
+  <div class="section-header">
+    <span class="section-number">13.2</span>
+    <span class="section-title">f-strings</span>
+  </div>
+
+  <h3>Format Strings</h3>
+  <p>An <strong>f-string</strong> starts with <code>f</code> before the quote. Expressions inside <code>{}</code> are evaluated and inserted into the string.</p>
+  <div class="code-block">num_camels = 23
+f'I have spotted {num_camels} camels'
+# 'I have spotted 23 camels'</div>
+
+  <h3>Expressions in Braces</h3>
+  <p>The braces can hold any Python expression — arithmetic, function calls, method calls, etc.</p>
+  <div class="code-block">num_years = 1.5
+f'In {round(num_years * 12)} months'
+# 'In 18 months'</div>
+
+  <h3>Writing Formatted Data</h3>
+  <p>f-strings are a clean way to write mixed data to text files. Remember to include <code>\n</code> for newlines — <code>write()</code> does not add them automatically.</p>
+  <div class="code-block">w = open('book.txt', 'w')
+w.write(f'Years: {num_years}\n')
+w.write(f'Camels: {num_camels}\n')
+w.close()</div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#5</span>
+      <span class="qa-q-text">What is an f-string in Python?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>A string prefixed with 'f' that can contain Python expressions in curly braces, which are evaluated and embedded in the result string.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 13.3 YAML ═══════ -->
+<section id="yaml">
+  <div class="section-header">
+    <span class="section-number">13.3</span>
+    <span class="section-title">YAML Configuration</span>
+  </div>
+
+  <h3>Serialization &amp; Deserialization</h3>
+  <p><strong>Serialization</strong> converts an object (dict, list) to a string. <strong>Deserialization</strong> converts it back. If you serialize then deserialize, you get an equivalent (but not identical) object.</p>
+
+  <h3>Writing YAML</h3>
+  <p>Use <code>yaml.dump(obj, file)</code> to write a Python object into a human-readable YAML text file.</p>
+  <div class="code-block">import yaml
+writer = open('config.yaml', 'w')
+yaml.dump(config, writer)
+writer.close()</div>
+
+  <h3>Reading YAML</h3>
+  <p>Use <code>yaml.safe_load(file)</code> to read YAML back into Python objects. Always prefer <code>safe_load</code> over <code>load</code> for security.</p>
+  <div class="code-block">reader = open('config.yaml')
+data = yaml.safe_load(reader)</div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#6</span>
+      <span class="qa-q-text">What is YAML used for in Python programs?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>YAML is used to read and write configuration data in a human-readable text format. The yaml module provides dump() for writing and safe_load() for reading.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#7</span>
+      <span class="qa-q-text">What is serialization and deserialization?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>Serialization converts an object (like a dict) to a string. Deserialization converts the string back to an object. Round-tripping should produce an equivalent object.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 13.4 SHELVE ═══════ -->
+<section id="shelve">
+  <div class="section-header">
+    <span class="section-number">13.4</span>
+    <span class="section-title">Shelve — Key-Value Store</span>
+  </div>
+
+  <h3>Opening a Shelf</h3>
+  <p>The <code>shelve</code> module provides a persistent key-value store. Open with <code>shelve.open(path, flag)</code>. Flag <code>"c"</code> creates if needed; <code>"n"</code> always creates a new empty shelf.</p>
+  <div class="code-block">import shelve
+db = shelve.open('photo_info/captions', 'c')</div>
+
+  <h3>Reading &amp; Writing</h3>
+  <p>Use bracket notation like a dictionary. Supports <code>keys()</code>, <code>values()</code>, <code>items()</code>, and the <code>in</code> operator.</p>
+  <div class="code-block">db['jan-2023/photo1.jpg'] = 'Cat nose'
+print(db['jan-2023/photo1.jpg'])</div>
+
+  <h3>Updating Mutable Values</h3>
+  <p>Modifying a retrieved mutable value (like a list) does <strong>not</strong> update the shelf. You must read → modify → write back explicitly.</p>
+  <div class="code-block">lst = db[key]
+lst.append('tops')
+db[key] = lst  # write back!</div>
+
+  <div class="callout">
+    <div class="label">Gotcha</div>
+    <p>Modifying a mutable value retrieved from a shelf and assigning it back is necessary because shelves store copies, not references. Always write back after mutating.</p>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#8</span>
+      <span class="qa-q-text">What does the shelve module provide?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>A key-value store (shelf) that behaves like a dictionary but persists data to disk files. You open it with shelve.open() and access it with bracket notation.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#9</span>
+      <span class="qa-q-text">Why can't you do db[key].append(word) to update a shelf list?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>Modifying the returned list doesn't update the shelf. You must read the value, modify it, then write it back: lst = db[key]; lst.append(word); db[key] = lst.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#10</span>
+      <span class="qa-q-text">What files does a shelf create on disk?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>Typically two files: a .dat file containing the stored data, and a .dir file containing database organization info for efficient access.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 13.6 HASHING ═══════ -->
+<section id="hashing">
+  <div class="section-header">
+    <span class="section-number">13.6</span>
+    <span class="section-title">Hashing &amp; Duplicate Detection</span>
+  </div>
+
+  <h3>Binary Mode</h3>
+  <p>Open image files with <code>"rb"</code> (read binary). The result is a <code>bytes</code> object — a sequence of bytes rather than text characters.</p>
+  <div class="code-block">data = open('photo.jpg', 'rb').read()
+type(data)  # <class 'bytes'></div>
+
+  <h3>MD5 Digests</h3>
+  <p>A hash function computes a <strong>digest</strong> — a fixed-size fingerprint of file contents. Two identical files produce the same digest; different files almost always produce different ones.</p>
+  <div class="code-block">import hashlib
+h = hashlib.md5()
+h.update(data)
+h.hexdigest()
+# 'aa1d2fc25b7ae247b2931f5a0882fa37'</div>
+
+  <h3>Comparing Files</h3>
+  <p>Instead of comparing every pair of files directly (slow), compute each file's digest and group by digest. Files sharing a digest are likely duplicates — confirm with direct comparison.</p>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#11</span>
+      <span class="qa-q-text">What does opening a file in binary mode ('rb') do?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>It reads the file contents as raw bytes instead of interpreting them as text characters. The result is a bytes object.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#12</span>
+      <span class="qa-q-text">What is an MD5 digest and what is it used for?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>An MD5 digest is a hexadecimal string computed by a hash function from file contents. If two files have the same digest, they almost certainly contain the same data.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 13.7 WALKING ═══════ -->
+<section id="walking">
+  <div class="section-header">
+    <span class="section-number">13.7</span>
+    <span class="section-title">Walking Directories</span>
+  </div>
+
+  <h3>Recursive Directory Walk</h3>
+  <p>A <strong>walk</strong> function uses <code>os.listdir</code> to iterate a directory, printing files and recursing into subdirectories.</p>
+  <div class="code-block">def walk(dirname):
+    for name in os.listdir(dirname):
+        path = os.path.join(dirname, name)
+        if os.path.isfile(path):
+            print(path)
+        elif os.path.isdir(path):
+            walk(path)</div>
+
+  <h3>Filtering by Extension</h3>
+  <p>Use <code>os.path.splitext(path)</code> to get the extension. Combine with the walk pattern to find only image files (or any target type).</p>
+  <div class="code-block">os.path.splitext('photo1.jpg')
+# ('photo1', '.jpg')</div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#13</span>
+      <span class="qa-q-text">How does the walk() function work for searching directories?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>It loops through a directory's contents using os.listdir(). For files, it processes them. For subdirectories, it calls itself recursively to search deeper.</p>
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#14</span>
+      <span class="qa-q-text">What does os.path.splitext() do?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>It splits a filename into its root and extension, e.g. ('photo1', '.jpg'). Useful for checking file types.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 13.8 DEBUGGING ═══════ -->
+<section id="debugging">
+  <div class="section-header">
+    <span class="section-number">13.8</span>
+    <span class="section-title">Debugging &amp; Glossary</span>
+  </div>
+
+  <h3>Invisible Whitespace</h3>
+  <p>Spaces, tabs (<code>\t</code>), and newlines (<code>\n</code>) are invisible when printed. The built-in <code>repr()</code> function reveals them using backslash sequences.</p>
+  <div class="code-block">s = '1 2\t 3\n 4'
+print(repr(s))
+# '1 2\t 3\n 4'</div>
+
+  <h3>Line Endings</h3>
+  <p>Different systems use different line endings: <code>\n</code> (Unix/macOS), <code>\r</code> (old Mac), or <code>\r\n</code> (Windows). Moving files across systems can cause issues.</p>
+
+  <div class="qa-card">
+    <div class="qa-question" onclick="toggleQA(this)">
+      <span class="qa-num">#15</span>
+      <span class="qa-q-text">What does the repr() function do for debugging?</span>
+      <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+    </div>
+    <div class="qa-answer">
+      <div class="answer-label">Answer</div>
+      <p>It returns a string representation of an object that shows invisible characters like \n (newline) and \t (tab), making whitespace issues visible.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ GLOSSARY ═══════ -->
+<section id="glossary">
+  <div class="section-header">
+    <span class="section-number"></span>
+    <span class="section-title">Key Terms</span>
+  </div>
+
+  <dl class="glossary-list">
+    <div class="glossary-item"><dt>ephemeral</dt><dd>A program that runs briefly and loses data when it ends.</dd></div>
+    <div class="glossary-item"><dt>persistent</dt><dd>A program that runs for a long time and saves data to long-term storage.</dd></div>
+    <div class="glossary-item"><dt>path</dt><dd>A string that identifies the location of a file or directory.</dd></div>
+    <div class="glossary-item"><dt>relative path</dt><dd>A path relative to the current working directory.</dd></div>
+    <div class="glossary-item"><dt>absolute path</dt><dd>A path starting from the root directory (/).</dd></div>
+    <div class="glossary-item"><dt>f-string</dt><dd>A formatted string literal that evaluates expressions in braces.</dd></div>
+    <div class="glossary-item"><dt>serialization</dt><dd>Converting an object to a string representation.</dd></div>
+    <div class="glossary-item"><dt>deserialization</dt><dd>Converting a string representation back to an object.</dd></div>
+    <div class="glossary-item"><dt>shelf</dt><dd>A persistent key-value store (shelve module).</dd></div>
+    <div class="glossary-item"><dt>digest</dt><dd>A hash fingerprint of file contents.</dd></div>
+    <div class="glossary-item"><dt>binary mode</dt><dd>Opening a file with 'rb' to read raw bytes.</dd></div>
+    <div class="glossary-item"><dt>walk</dt><dd>Recursively traversing a directory tree.</dd></div>
+  </dl>
+</section>
+
+<!-- ═══════ FLASHCARDS ═══════ -->
+<section id="flashcards">
+  <div class="section-header">
+    <span class="section-number"></span>
+    <span class="section-title">All Flashcard Questions</span>
+  </div>
+
+  <div class="flashcard-section">
+    <p>All 15 flashcards from the companion flashcard deck, organized for quick review:</p>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F1</span>
+        <span class="qa-q-text">What is the difference between an ephemeral and a persistent program?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>Ephemeral programs run briefly and lose data when they end. Persistent programs run for a long time, keep data in long-term storage, and can resume where they left off.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F2</span>
+        <span class="qa-q-text">What does os.getcwd() return?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>It returns the current working directory as a string path, e.g. '/home/dinsdale'.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F3</span>
+        <span class="qa-q-text">What is the difference between a relative path and an absolute path?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>A relative path is relative to the current directory (e.g. 'memo.txt'). An absolute path starts with / and doesn't depend on the current directory (e.g. '/home/dinsdale/memo.txt').</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F4</span>
+        <span class="qa-q-text">What does os.path.join() do and why is it useful?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>It joins directory and file names into a path using the correct separator (/ or \) for the current operating system, making code cross-platform.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F5</span>
+        <span class="qa-q-text">What is an f-string in Python?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>A string prefixed with 'f' that can contain Python expressions in curly braces, which are evaluated and embedded in the result string.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F6</span>
+        <span class="qa-q-text">What is YAML used for in Python programs?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>YAML is used to read and write configuration data in a human-readable text format. The yaml module provides dump() for writing and safe_load() for reading.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F7</span>
+        <span class="qa-q-text">What is serialization and deserialization?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>Serialization converts an object (like a dict) to a string. Deserialization converts the string back to an object. Round-tripping should produce an equivalent object.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F8</span>
+        <span class="qa-q-text">What does the shelve module provide?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>A key-value store (shelf) that behaves like a dictionary but persists data to disk files. You open it with shelve.open() and access it with bracket notation.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F9</span>
+        <span class="qa-q-text">Why can't you do db[key].append(word) to update a shelf list?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>Modifying the returned list doesn't update the shelf. You must read the value, modify it, then write it back: lst = db[key]; lst.append(word); db[key] = lst.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F10</span>
+        <span class="qa-q-text">What does opening a file in binary mode ('rb') do?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>It reads the file contents as raw bytes instead of interpreting them as text characters. The result is a bytes object.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F11</span>
+        <span class="qa-q-text">What is an MD5 digest and what is it used for?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>An MD5 digest is a hexadecimal string computed by a hash function from file contents. If two files have the same digest, they almost certainly contain the same data.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F12</span>
+        <span class="qa-q-text">How does the walk() function work for searching directories?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>It loops through a directory's contents using os.listdir(). For files, it processes them. For subdirectories, it calls itself recursively to search deeper.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F13</span>
+        <span class="qa-q-text">What does os.path.splitext() do?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>It splits a filename into its root and extension, e.g. ('photo1', '.jpg'). Useful for checking file types.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F14</span>
+        <span class="qa-q-text">What files does a shelf create on disk?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>Typically two files: a .dat file containing the stored data, and a .dir file containing database organization info for efficient access.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question" onclick="toggleQA(this)">
+        <span class="qa-num">F15</span>
+        <span class="qa-q-text">What does the repr() function do for debugging?</span>
+        <span class="qa-toggle"><span class="qa-chevron">▶</span>Show</span>
+      </div>
+      <div class="qa-answer">
+        <div class="answer-label">Answer</div>
+        <p>It returns a string representation of an object that shows invisible characters like \n (newline) and \t (tab), making whitespace issues visible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>Chapter 13 — Files &amp; Databases · Think Python Study Guide</footer>
+
+<script>
+function toggleQA(el) {
+  var card = el.closest('.qa-card');
+  card.classList.toggle('open');
+  var toggle = card.querySelector('.qa-toggle');
+  if (card.classList.contains('open')) {
+    toggle.innerHTML = '<span class="qa-chevron">▼</span>Hide';
+  } else {
+    toggle.innerHTML = '<span class="qa-chevron">▶</span>Show';
+  }
+}
+</script>
+
+</body>
+</html>

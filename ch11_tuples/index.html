@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Tuples — Interactive Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Code+Pro:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d1117;--surface:#161b22;--card:#1c2333;--border:#30363d;
+  --accent:#58a6ff;--accent2:#f78166;--accent3:#7ee787;--accent4:#d2a8ff;
+  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
+  --code-bg:#0d1117;--highlight:#1f6feb22;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;overflow-x:hidden;
+}
+/* Grain overlay */
+body::before{
+  content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
+  opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Header */
+.hero{
+  padding:3rem 2rem 2rem;text-align:center;position:relative;
+  background:linear-gradient(180deg,#161b2288,transparent);
+}
+.hero h1{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:clamp(2.4rem,5vw,3.8rem);
+  background:linear-gradient(135deg,var(--accent),var(--accent4));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-.02em;line-height:1.15;
+}
+.hero p{color:var(--text2);margin-top:.6rem;font-size:1.05rem}
+.stats{
+  display:flex;gap:1.5rem;justify-content:center;margin-top:1.4rem;flex-wrap:wrap;
+}
+.stat{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:.55rem 1.1rem;font-size:.85rem;color:var(--text2);
+}
+.stat strong{color:var(--text);font-weight:600}
+
+/* Navigation pills */
+.nav-bar{
+  display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;
+  padding:1rem 2rem;position:sticky;top:0;z-index:100;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
+}
+.nav-pill{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:.4rem .9rem;font-size:.78rem;color:var(--text2);cursor:pointer;
+  transition:all .2s;font-family:'DM Sans',sans-serif;
+}
+.nav-pill:hover,.nav-pill.active{
+  background:var(--accent);color:var(--bg);border-color:var(--accent);
+}
+
+/* Main grid */
+.container{max-width:900px;margin:0 auto;padding:1.5rem}
+
+/* Topic Card */
+.topic{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  margin-bottom:1.5rem;overflow:hidden;
+  transition:border-color .3s;
+}
+.topic:hover{border-color:var(--text3)}
+.topic-header{
+  display:flex;align-items:center;gap:.8rem;padding:1.2rem 1.4rem;
+  cursor:pointer;user-select:none;
+}
+.topic-num{
+  font-family:'Source Code Pro',monospace;font-weight:600;font-size:.75rem;
+  background:var(--accent);color:var(--bg);border-radius:6px;
+  padding:.25rem .5rem;min-width:2rem;text-align:center;white-space:nowrap;
+}
+.topic-num.green{background:var(--accent3)}
+.topic-num.orange{background:var(--accent2)}
+.topic-num.purple{background:var(--accent4)}
+.topic-title{
+  font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;flex:1;
+}
+.topic-toggle{
+  font-size:1.3rem;transition:transform .3s;color:var(--text3);
+}
+.topic.open .topic-toggle{transform:rotate(45deg)}
+.topic-body{
+  max-height:0;overflow:hidden;transition:max-height .4s ease;
+}
+.topic.open .topic-body{max-height:3000px}
+.topic-content{
+  padding:0 1.4rem 1.4rem;line-height:1.7;color:var(--text2);font-size:.95rem;
+}
+.topic-content h3{
+  color:var(--text);font-size:1rem;margin:1.2rem 0 .5rem;font-weight:600;
+}
+.topic-content ul{padding-left:1.2rem;margin:.5rem 0}
+.topic-content li{margin:.3rem 0}
+.topic-content code{
+  font-family:'Source Code Pro',monospace;
+  background:var(--code-bg);border:1px solid var(--border);
+  padding:.15rem .4rem;border-radius:4px;font-size:.85rem;color:var(--accent3);
+}
+pre.code-block{
+  background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
+  padding:1rem;margin:.8rem 0;overflow-x:auto;
+  font-family:'Source Code Pro',monospace;font-size:.82rem;
+  line-height:1.6;color:var(--accent3);
+}
+.key-point{
+  background:var(--highlight);border-left:3px solid var(--accent);
+  padding:.7rem 1rem;border-radius:0 8px 8px 0;margin:.8rem 0;
+  font-size:.9rem;color:var(--text);
+}
+
+/* Questions section inside topic */
+.questions{margin-top:1rem}
+.q-item{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  margin:.6rem 0;overflow:hidden;
+}
+.q-header{
+  display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;
+  cursor:pointer;font-size:.9rem;color:var(--text);
+}
+.q-marker{
+  font-family:'Source Code Pro',monospace;font-size:.7rem;font-weight:600;
+  color:var(--accent2);min-width:1.4rem;
+}
+.q-text{flex:1}
+.q-chevron{color:var(--text3);transition:transform .25s;font-size:.8rem}
+.q-item.open .q-chevron{transform:rotate(90deg)}
+.q-answer{
+  max-height:0;overflow:hidden;transition:max-height .35s ease;
+}
+.q-item.open .q-answer{max-height:1000px}
+.q-answer-inner{
+  padding:0 1rem .8rem 2.4rem;font-size:.88rem;line-height:1.65;color:var(--text2);
+}
+
+/* Add question form */
+.add-q-btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:none;border:1px dashed var(--border);border-radius:8px;
+  padding:.5rem .9rem;color:var(--accent);cursor:pointer;
+  font-size:.82rem;font-family:'DM Sans',sans-serif;margin-top:.6rem;
+  transition:all .2s;
+}
+.add-q-btn:hover{border-color:var(--accent);background:var(--highlight)}
+.add-form{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:1rem;margin-top:.6rem;display:none;
+}
+.add-form.show{display:block}
+.add-form label{font-size:.8rem;color:var(--text2);display:block;margin-bottom:.3rem}
+.add-form input,.add-form textarea{
+  width:100%;background:var(--code-bg);border:1px solid var(--border);
+  border-radius:6px;padding:.5rem .7rem;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.88rem;margin-bottom:.7rem;
+  outline:none;resize:vertical;
+}
+.add-form input:focus,.add-form textarea:focus{border-color:var(--accent)}
+.add-form textarea{min-height:60px}
+.form-actions{display:flex;gap:.5rem;justify-content:flex-end}
+.btn-save{
+  background:var(--accent);color:var(--bg);border:none;border-radius:6px;
+  padding:.45rem .9rem;font-size:.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-weight:600;
+}
+.btn-save:hover{filter:brightness(1.15)}
+.btn-cancel{
+  background:none;border:1px solid var(--border);border-radius:6px;
+  padding:.45rem .9rem;font-size:.82rem;cursor:pointer;color:var(--text2);
+  font-family:'DM Sans',sans-serif;
+}
+.btn-cancel:hover{border-color:var(--text3)}
+
+/* Footer */
+.footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.topic{animation:fadeUp .5s ease both}
+.topic:nth-child(2){animation-delay:.05s}
+.topic:nth-child(3){animation-delay:.1s}
+.topic:nth-child(4){animation-delay:.15s}
+.topic:nth-child(5){animation-delay:.2s}
+.topic:nth-child(6){animation-delay:.25s}
+.topic:nth-child(7){animation-delay:.3s}
+.topic:nth-child(8){animation-delay:.35s}
+.topic:nth-child(9){animation-delay:.4s}
+.topic:nth-child(10){animation-delay:.45s}
+
+@media(max-width:600px){
+  .hero{padding:2rem 1rem 1.5rem}
+  .container{padding:1rem}
+  .topic-header{padding:1rem}
+  .topic-content{padding:0 1rem 1rem}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Python Tuples</h1>
+  <p>Chapter 11 — Interactive Study Guide</p>
+  <div class="stats">
+    <div class="stat"><strong id="topicCount">10</strong> topics</div>
+    <div class="stat"><strong id="questionCount">0</strong> questions</div>
+    <div class="stat">Click a question to reveal the answer</div>
+  </div>
+</div>
+
+<nav class="nav-bar" id="navBar"></nav>
+
+<div class="container" id="topics"></div>
+
+<div class="footer">Python Tuples Study Guide · Add your own questions to test yourself</div>
+
+<script>
+const COLORS = ['','green','orange','purple'];
+
+const topicsData = [
+  {
+    id:'basics',title:'Tuples Are Like Lists',
+    color:0,
+    content:`
+      <p>A <strong>tuple</strong> is a sequence of values indexed by integers — much like a list. Values can be any type.</p>
+      <pre class="code-block">t = ('l', 'u', 'p', 'i', 'n')
+type(t)  # tuple</pre>
+      <h3>Creating Tuples</h3>
+      <ul>
+        <li>Comma-separated values: <code>t = 'a', 'b', 'c'</code></li>
+        <li>With parentheses: <code>t = ('a', 'b', 'c')</code></li>
+        <li>Single element needs trailing comma: <code>t1 = ('p',)</code></li>
+        <li>Using <code>tuple()</code> built-in: <code>tuple('lupin')</code></li>
+      </ul>
+      <div class="key-point">A single value in parentheses without a comma is <em>not</em> a tuple — <code>('p')</code> is just a string.</div>
+      <h3>Supported Operations</h3>
+      <ul>
+        <li>Indexing: <code>t[0]</code> → <code>'l'</code></li>
+        <li>Slicing: <code>t[1:3]</code> → <code>('u', 'p')</code></li>
+        <li>Concatenation: <code>tuple('lup') + ('i', 'n')</code></li>
+        <li>Repetition: <code>tuple('spam') * 2</code></li>
+        <li><code>sorted(t)</code> returns a <strong>list</strong>, not a tuple</li>
+        <li><code>reversed(t)</code> returns a reversed object</li>
+      </ul>
+    `,
+    questions:[
+      {q:'How do you create a tuple with a single element?',a:'Include a trailing comma: t = (\"p\",). Without the comma, (\"p\") is just a string in parentheses.'},
+      {q:'What does sorted() return when given a tuple?',a:'It returns a list, not a tuple. You\'d need to wrap it in tuple() to get a tuple back.'},
+    ]
+  },
+  {
+    id:'immutable',title:'Tuples Are Immutable',
+    color:1,
+    content:`
+      <p>You <strong>cannot modify</strong> a tuple after creation. Attempting to assign to an index raises a <code>TypeError</code>.</p>
+      <pre class="code-block">t[0] = 'L'
+# TypeError: 'tuple' object does not support item assignment</pre>
+      <p>Tuples also lack mutating methods like <code>append()</code>, <code>remove()</code>, <code>insert()</code>, etc.</p>
+      <div class="key-point">Because tuples are immutable, they are <strong>hashable</strong> and can be used as dictionary keys — unlike lists.</div>
+      <pre class="code-block">d = {}
+d[1, 2] = 3      # tuple as key
+d[(3, 4)] = 7    # same syntax with parens
+d[1, 2]           # → 3</pre>
+    `,
+    questions:[
+      {q:'Can tuples always be used as dictionary keys?',a:'Not always. If a tuple contains mutable elements (like lists), it becomes unhashable and cannot be a dictionary key.'},
+      {q:'What error do you get when trying to modify a tuple element?',a:'TypeError: \'tuple\' object does not support item assignment.'},
+    ]
+  },
+  {
+    id:'assignment',title:'Tuple Assignment (Unpacking)',
+    color:2,
+    content:`
+      <p>You can assign multiple variables at once using tuple unpacking.</p>
+      <pre class="code-block">a, b = 1, 2          # a=1, b=2
+username, domain = 'monty@python.org'.split('@')</pre>
+      <h3>Swapping Variables</h3>
+      <pre class="code-block"># Traditional way:
+temp = a; a = b; b = temp
+
+# Pythonic way:
+a, b = b, a</pre>
+      <div class="key-point">All expressions on the right side are evaluated before any assignments happen, which is why swapping works without a temp variable.</div>
+      <h3>Looping with Tuple Unpacking</h3>
+      <pre class="code-block">d = {'one': 1, 'two': 2}
+for key, value in d.items():
+    print(key, '->', value)</pre>
+    `,
+    questions:[
+      {q:'What happens if the number of variables doesn\'t match the number of values?',a:'You get a ValueError, e.g. "too many values to unpack (expected 2)".'},
+    ]
+  },
+  {
+    id:'return',title:'Tuples as Return Values',
+    color:3,
+    content:`
+      <p>Functions can effectively return multiple values by returning a tuple.</p>
+      <pre class="code-block">def min_max(t):
+    return min(t), max(t)
+
+low, high = min_max([2, 4, 1, 3])
+# low=1, high=4</pre>
+      <p>The built-in <code>divmod</code> returns a tuple of (quotient, remainder):</p>
+      <pre class="code-block">quotient, remainder = divmod(7, 3)
+# quotient=2, remainder=1</pre>
+    `,
+    questions:[
+      {q:'What does divmod(7, 3) return?',a:'The tuple (2, 1) — quotient 2 and remainder 1.'},
+    ]
+  },
+  {
+    id:'packing',title:'Argument Packing & Unpacking',
+    color:0,
+    content:`
+      <p>The <code>*</code> operator packs multiple arguments into a tuple parameter, or unpacks a sequence into separate arguments.</p>
+      <h3>Packing (*args)</h3>
+      <pre class="code-block">def mean(*args):
+    return sum(args) / len(args)
+
+mean(1, 2, 3)  # → 2.0</pre>
+      <h3>Unpacking (*sequence)</h3>
+      <pre class="code-block">t = (7, 3)
+divmod(*t)     # same as divmod(7, 3) → (2, 1)</pre>
+      <h3>Practical Example: Trimmed Mean</h3>
+      <pre class="code-block">def trimmed_mean(*args):
+    low, high = min_max(args)
+    trimmed = list(args)
+    trimmed.remove(low)
+    trimmed.remove(high)
+    return mean(*trimmed)</pre>
+    `,
+    questions:[
+      {q:'What happens if you pass a tuple to divmod without unpacking?',a:'You get a TypeError because divmod expects 2 arguments but receives 1 (the tuple counts as a single argument).'},
+    ]
+  },
+  {
+    id:'zip',title:'Zip & Enumerate',
+    color:1,
+    content:`
+      <p><code>zip()</code> pairs up elements from two or more sequences like the teeth of a zipper.</p>
+      <pre class="code-block">scores1 = [1, 2, 4, 5, 1, 5, 2]
+scores2 = [5, 5, 2, 2, 5, 2, 3]
+
+wins = 0
+for t1, t2 in zip(scores1, scores2):
+    if t1 > t2:
+        wins += 1   # → wins = 3</pre>
+      <h3>Making Dictionaries with zip</h3>
+      <pre class="code-block">letters = 'abcdefghijklmnopqrstuvwxyz'
+letter_map = dict(zip(letters, range(26)))
+letter_map['a']  # → 0</pre>
+      <h3>Enumerate</h3>
+      <pre class="code-block">for index, element in enumerate('abc'):
+    print(index, element)
+# 0 a  /  1 b  /  2 c</pre>
+    `,
+    questions:[
+      {q:'How do you convert a zip object to a list of tuples?',a:'Wrap it with list(): list(zip(seq1, seq2)) gives a list of paired tuples.'},
+      {q:'What does enumerate return?',a:'An enumerate object that yields (index, element) pairs starting from index 0.'},
+    ]
+  },
+  {
+    id:'sorting',title:'Comparing & Sorting Tuples',
+    color:2,
+    content:`
+      <p>Tuples are compared <strong>lexicographically</strong> — element by element from left to right.</p>
+      <pre class="code-block">(0, 1, 2) < (0, 3, 4)       # True (compares 1 < 3)
+(0, 1, 2000000) < (0, 3, 4) # True (still 1 < 3)</pre>
+      <h3>Custom Sort Keys</h3>
+      <pre class="code-block">def second_element(t):
+    return t[1]
+
+items = [('b', 1), ('a', 3), ('n', 2)]
+sorted(items, key=second_element)
+# [('b', 1), ('n', 2), ('a', 3)]</pre>
+      <div class="key-point">Use <code>max(items, key=second_element)</code> to find the item with the highest count without sorting the entire list.</div>
+    `,
+    questions:[
+      {q:'How does Python compare two tuples?',a:'Lexicographically: it compares the first elements; if equal, moves to the second, and so on. Once a difference is found, subsequent elements are ignored.'},
+    ]
+  },
+  {
+    id:'invert',title:'Inverting a Dictionary',
+    color:3,
+    content:`
+      <p>When inverting a dictionary, multiple keys may share the same value, so the inverted dictionary maps values to <strong>lists of keys</strong>.</p>
+      <pre class="code-block">def invert_dict(d):
+    new = {}
+    for key, value in d.items():
+        if value not in new:
+            new[value] = [key]
+        else:
+            new[value].append(key)
+    return new
+
+d = {'p':1, 'a':1, 'r':2, 'o':1, 't':1}
+invert_dict(d)
+# {1: ['p','a','o','t'], 2: ['r']}</pre>
+    `,
+    questions:[
+      {q:'Why can\'t you simply swap keys and values when inverting a dictionary?',a:'Because multiple keys may have the same value, and dictionary keys must be unique. So the inverted dict maps each value to a list of original keys.'},
+    ]
+  },
+  {
+    id:'debugging',title:'Debugging with structshape',
+    color:0,
+    content:`
+      <p>The <code>structshape</code> module helps inspect compound data structures by returning a string summary.</p>
+      <pre class="code-block">from structshape import structshape
+
+structshape([1, 2, 3])          # 'list of 3 int'
+structshape([[1,2],[3,4]])      # 'list of 2 list of 2 int'
+structshape(dict(zip([1,2],['a','b'])))  # 'dict of 2 int->str'</pre>
+      <div class="key-point">Compound data structures (lists of tuples, dicts with tuple keys and list values) are powerful but error-prone. Use structshape to verify types and shapes when debugging.</div>
+    `,
+    questions:[]
+  },
+  {
+    id:'exercises',title:'Exercises & Challenges',
+    color:1,
+    content:`
+      <h3>Caesar Cipher</h3>
+      <p>Write <code>shift_word(word, n)</code> that shifts each letter by n places. "cheer" shifted by 7 → "jolly".</p>
+      <h3>Most Frequent Letters</h3>
+      <p>Write <code>most_frequent_letters(s)</code> that prints letters in decreasing frequency order.</p>
+      <h3>Anagram Finder</h3>
+      <p>Group all words from a word list that are anagrams of each other. Hint: sort each word's letters as a key.</p>
+      <h3>Word Distance</h3>
+      <p>Write <code>word_distance(w1, w2)</code> that counts positions where letters differ. Use <code>zip</code>.</p>
+      <h3>Metathesis Pairs</h3>
+      <p>Find word pairs where swapping exactly two letters transforms one into the other. Hint: they must be anagrams with word_distance == 2.</p>
+    `,
+    questions:[
+      {q:'What\'s the key insight for grouping anagrams?',a:'Sort each word\'s letters to create a canonical form. Words with the same sorted form are anagrams. Use this as a dictionary key mapping to lists of words.'},
+      {q:'How would you implement shift_word using letter_map?',a:'Look up each letter\'s index, add the shift amount, use modulo 26 to wrap around, then look up the letter at the new index. Join results into a string.'},
+    ]
+  },
+];
+
+// State
+let userQuestions = {}; // topicId -> [{q,a}]
+try { userQuestions = JSON.parse(localStorage.getItem('tupleQ') || '{}'); } catch(e){}
+
+function saveUserQ(){ localStorage.setItem('tupleQ', JSON.stringify(userQuestions)); }
+
+function countAllQuestions(){
+  let c = 0;
+  topicsData.forEach(t => {
+    c += t.questions.length;
+    c += (userQuestions[t.id]||[]).length;
+  });
+  return c;
+}
+
+function renderNav(){
+  const nav = document.getElementById('navBar');
+  nav.innerHTML = topicsData.map(t =>
+    `<button class="nav-pill" data-id="${t.id}">${t.title}</button>`
+  ).join('');
+  nav.querySelectorAll('.nav-pill').forEach(btn => {
+    btn.onclick = () => {
+      document.getElementById('topic-'+btn.dataset.id)?.scrollIntoView({behavior:'smooth',block:'start'});
+    };
+  });
+}
+
+function renderQuestions(topic){
+  const allQ = [...topic.questions, ...(userQuestions[topic.id]||[])];
+  if(allQ.length === 0 && !true) return '';
+  return `<div class="questions">
+    <h3 style="margin-bottom:.4rem">📝 Questions</h3>
+    ${allQ.map((q,i) => `
+      <div class="q-item" onclick="this.classList.toggle('open')">
+        <div class="q-header">
+          <span class="q-marker">Q${i+1}</span>
+          <span class="q-text">${q.q}</span>
+          <span class="q-chevron">▶</span>
+        </div>
+        <div class="q-answer"><div class="q-answer-inner">${q.a}</div></div>
+      </div>
+    `).join('')}
+    <button class="add-q-btn" onclick="event.stopPropagation();toggleForm('${topic.id}')">+ Add Question</button>
+    <div class="add-form" id="form-${topic.id}">
+      <label>Your question</label>
+      <input type="text" id="qinput-${topic.id}" placeholder="Type your question…">
+      <label>Answer (hidden until clicked)</label>
+      <textarea id="ainput-${topic.id}" placeholder="Type the answer…"></textarea>
+      <div class="form-actions">
+        <button class="btn-cancel" onclick="event.stopPropagation();toggleForm('${topic.id}')">Cancel</button>
+        <button class="btn-save" onclick="event.stopPropagation();addQuestion('${topic.id}')">Save</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderTopics(){
+  const container = document.getElementById('topics');
+  container.innerHTML = topicsData.map((t,i) => `
+    <div class="topic" id="topic-${t.id}">
+      <div class="topic-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="topic-num ${COLORS[t.color]}">${String(i+1).padStart(2,'0')}</span>
+        <span class="topic-title">${t.title}</span>
+        <span class="topic-toggle">+</span>
+      </div>
+      <div class="topic-body">
+        <div class="topic-content">
+          ${t.content}
+          ${renderQuestions(t)}
+        </div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('topicCount').textContent = topicsData.length;
+  document.getElementById('questionCount').textContent = countAllQuestions();
+}
+
+function toggleForm(id){
+  const f = document.getElementById('form-'+id);
+  f.classList.toggle('show');
+}
+
+function addQuestion(topicId){
+  const q = document.getElementById('qinput-'+topicId).value.trim();
+  const a = document.getElementById('ainput-'+topicId).value.trim();
+  if(!q){alert('Please enter a question.');return;}
+  if(!userQuestions[topicId]) userQuestions[topicId]=[];
+  userQuestions[topicId].push({q, a: a||'(No answer provided)'});
+  saveUserQ();
+  renderTopics();
+  // reopen the topic
+  document.getElementById('topic-'+topicId).classList.add('open');
+}
+
+renderNav();
+renderTopics();
+
+// Intersection observer for nav highlight
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      const id = e.target.id.replace('topic-','');
+      document.querySelectorAll('.nav-pill').forEach(p => p.classList.toggle('active', p.dataset.id===id));
+    }
+  });
+},{threshold:0.3});
+topicsData.forEach(t => observer.observe(document.getElementById('topic-'+t.id)));
+</script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12 — Text Analysis & Generation | Python Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0c0f14;--surface:#151921;--surface2:#1c2230;--border:#2a3040;--text:#e0e4ec;--muted:#8892a4;--accent:#f59e0b;--accent2:#3b82f6;--accent3:#10b981;--accent4:#e879f9;--accent5:#f87171;--code-bg:#1a1f2b}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.hero{position:relative;padding:60px 40px 40px;text-align:center;overflow:hidden;background:linear-gradient(170deg,#0c0f14 0%,#1a1230 40%,#0f1a2a 70%,#0c0f14 100%)}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(600px circle at 30% 20%,rgba(245,158,11,.08),transparent),radial-gradient(400px circle at 70% 70%,rgba(59,130,246,.06),transparent);pointer-events:none}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2.2rem,5vw,3.8rem);color:#fff;position:relative}
+.hero h1 span{color:var(--accent);font-style:italic}
+.hero p{font-size:1.05rem;color:var(--muted);margin-top:12px;position:relative}
+nav{position:sticky;top:0;z-index:100;background:rgba(12,15,20,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+nav a{flex-shrink:0;padding:6px 14px;border-radius:99px;font-size:.8rem;font-weight:500;background:var(--surface);color:var(--muted);border:1px solid var(--border);cursor:pointer;transition:all .25s;text-decoration:none;white-space:nowrap}
+nav a:hover,nav a.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.container{max-width:900px;margin:0 auto;padding:32px 24px 80px}
+section{margin-bottom:48px;scroll-margin-top:70px}
+.section-label{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:10px}
+.section-label .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+section h2{font-family:'DM Serif Display',serif;font-size:1.6rem;color:#fff;margin-bottom:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 24px 20px;margin-bottom:16px;transition:border-color .3s}
+.card:hover{border-color:var(--accent)}
+.card h3{font-size:1.05rem;font-weight:600;margin-bottom:8px;color:#fff}
+.card p{color:var(--muted);font-size:.92rem}
+code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:var(--code-bg);padding:2px 7px;border-radius:5px;color:var(--accent3)}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:14px 0;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.8;color:var(--text)}
+pre .kw{color:var(--accent4)}pre .fn{color:var(--accent2)}pre .st{color:var(--accent3)}pre .cm{color:var(--muted);font-style:italic}pre .num{color:var(--accent)}
+.diagram{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin:20px 0;text-align:center}
+.flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+.flow-box{padding:8px 16px;border-radius:10px;font-size:.82rem;font-weight:500;border:1.5px solid}
+.flow-box.b1{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--accent)}
+.flow-box.b2{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:var(--accent2)}
+.flow-box.b3{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:var(--accent3)}
+.flow-box.b4{background:rgba(232,121,249,.1);border-color:rgba(232,121,249,.3);color:var(--accent4)}
+.flow-arrow{color:var(--muted);font-size:1.1rem}
+.glassy{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.gloss-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;transition:border-color .3s}
+.gloss-item:hover{border-color:var(--accent4)}
+.gloss-item dt{font-weight:600;font-size:.9rem;color:#fff;margin-bottom:4px;font-family:'JetBrains Mono',monospace}
+.gloss-item dd{font-size:.82rem;color:var(--muted)}
+.q-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:14px}
+.q-card .q-num{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.q-card .q-text{font-size:.95rem;font-weight:500;color:#fff;margin-bottom:14px}
+.q-options{display:flex;flex-direction:column;gap:8px}
+.q-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;transition:all .2s;font-size:.88rem;color:var(--muted)}
+.q-opt:hover{border-color:var(--accent2);color:var(--text)}
+.q-opt.selected{border-color:var(--accent2);background:rgba(59,130,246,.08);color:#fff}
+.q-opt.correct{border-color:var(--accent3);background:rgba(16,185,129,.1);color:var(--accent3)}
+.q-opt.wrong{border-color:var(--accent5);background:rgba(248,113,113,.08);color:var(--accent5)}
+.q-opt .radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.q-opt.selected .radio{border-color:var(--accent2)}
+.q-opt.selected .radio::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--accent2)}
+.q-opt.correct .radio{border-color:var(--accent3)}
+.q-opt.correct .radio::after{content:'\2713';font-size:9px;color:var(--accent3);width:auto;height:auto;border-radius:0;background:none}
+.q-opt.wrong .radio{border-color:var(--accent5)}
+.check-btn{margin-top:12px;padding:8px 24px;border-radius:10px;border:none;background:var(--accent2);color:#fff;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .25s;opacity:.5;pointer-events:none}
+.check-btn.enabled{opacity:1;pointer-events:auto}
+.check-btn:hover{filter:brightness(1.15)}
+.q-feedback{margin-top:10px;font-size:.85rem;padding:8px 14px;border-radius:8px;display:none}
+.q-feedback.show{display:block}
+.q-feedback.right{background:rgba(16,185,129,.1);color:var(--accent3)}
+.q-feedback.wrong-fb{background:rgba(248,113,113,.08);color:var(--accent5)}
+@media(max-width:600px){.hero{padding:40px 20px 30px}.container{padding:20px 16px 60px}.glassy{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Chapter 12 — <span>Text Analysis</span> &amp; Generation</h1>
+  <p>Dictionaries, bigrams, Markov chains, and building a text generator from scratch.</p>
+</div>
+
+<nav>
+  <a href="#unique-words">Unique Words</a>
+  <a href="#punctuation">Punctuation</a>
+  <a href="#frequencies">Frequencies</a>
+  <a href="#optional">Optional Params</a>
+  <a href="#subtract">Dict Subtraction</a>
+  <a href="#random">Random</a>
+  <a href="#bigrams">Bigrams</a>
+  <a href="#markov">Markov</a>
+  <a href="#generate">Generate</a>
+  <a href="#glossary">Glossary</a>
+  <a href="#quiz">Quiz</a>
+</nav>
+
+<div class="container">
+
+<section id="unique-words">
+  <div class="section-label"><span class="dot"></span> Section 12.1</div>
+  <h2>Counting Unique Words</h2>
+  <div class="card"><h3>Core Idea</h3><p>Read a text file line by line, split each line into words, and store each word as a <strong>key</strong> in a dictionary. The dictionary's length gives the count of unique words.</p></div>
+  <pre><span class="cm"># Store each word as a key</span>
+unique_words = {}
+<span class="kw">for</span> line <span class="kw">in</span> <span class="fn">open</span>(filename):
+    <span class="kw">for</span> word <span class="kw">in</span> line.<span class="fn">split</span>():
+        unique_words[word] = <span class="num">1</span>
+
+<span class="fn">len</span>(unique_words)  <span class="cm"># ≈ 6040</span></pre>
+  <div class="card"><h3>Why a Dictionary?</h3><p>Dictionaries automatically handle duplicates &mdash; adding the same key again just overwrites the value. And the <code>in</code> operator checks membership in <em>O(1)</em> time.</p></div>
+</section>
+
+<section id="punctuation">
+  <div class="section-label"><span class="dot"></span> Section 12.2</div>
+  <h2>Handling Punctuation</h2>
+  <div class="card"><h3>Two Problems</h3><p><strong>1)</strong> Dashes (&mdash;) glue words together &rarr; replace with spaces before splitting.<br><strong>2)</strong> Punctuation sticks to word edges &rarr; use <code>strip()</code> to remove it.</p></div>
+  <div class="diagram">
+    <div style="font-size:.82rem;color:var(--muted);margin-bottom:10px">Processing pipeline</div>
+    <div class="flow">
+      <div class="flow-box b1">Raw line</div><span class="flow-arrow">&rarr;</span>
+      <div class="flow-box b2">Replace &mdash; with space</div><span class="flow-arrow">&rarr;</span>
+      <div class="flow-box b3">split()</div><span class="flow-arrow">&rarr;</span>
+      <div class="flow-box b4">strip + lower</div>
+    </div>
+  </div>
+  <pre><span class="kw">import</span> unicodedata
+
+<span class="kw">def</span> <span class="fn">split_line</span>(line):
+    <span class="kw">return</span> line.<span class="fn">replace</span>(<span class="st">'&mdash;'</span>, <span class="st">' '</span>).<span class="fn">split</span>()
+
+<span class="kw">def</span> <span class="fn">clean_word</span>(word):
+    <span class="kw">return</span> word.<span class="fn">strip</span>(punctuation).<span class="fn">lower</span>()</pre>
+  <div class="card"><h3>Unicode Categories</h3><p><code>unicodedata.category('A')</code> &rarr; <code>'Lu'</code>. Characters starting with <code>'P'</code> are punctuation &mdash; used to build the string for <code>strip()</code>.</p></div>
+</section>
+
+<section id="frequencies">
+  <div class="section-label"><span class="dot"></span> Section 12.3</div>
+  <h2>Word Frequencies</h2>
+  <div class="card"><h3>Counting Pattern</h3><p>If a word is new, initialize its count to 1. If it already exists, increment. This is the classic histogram pattern with dictionaries.</p></div>
+  <pre>word_counter = {}
+<span class="kw">for</span> line <span class="kw">in</span> <span class="fn">open</span>(filename):
+    <span class="kw">for</span> word <span class="kw">in</span> <span class="fn">split_line</span>(line):
+        word = <span class="fn">clean_word</span>(word)
+        <span class="kw">if</span> word <span class="kw">not in</span> word_counter:
+            word_counter[word] = <span class="num">1</span>
+        <span class="kw">else</span>:
+            word_counter[word] += <span class="num">1</span></pre>
+  <div class="card"><h3>Sorting by Frequency</h3><p>Use <code>sorted(word_counter.items(), key=..., reverse=True)</code>. Top 5 in <em>Dr. Jekyll</em>: "the", "and", "of", "to", "i".</p></div>
+</section>
+
+<section id="optional">
+  <div class="section-label"><span class="dot"></span> Section 12.4</div>
+  <h2>Optional Parameters</h2>
+  <div class="card"><h3>Default Values</h3><p>A parameter like <code>num=5</code> gives it a <em>default value</em>. Callers can override it. All required params must come before optional ones.</p></div>
+  <pre><span class="kw">def</span> <span class="fn">print_most_common</span>(word_counter, num=<span class="num">5</span>):
+    items = <span class="fn">sorted</span>(word_counter.<span class="fn">items</span>(),
+                   key=second_element, reverse=<span class="kw">True</span>)
+    <span class="kw">for</span> word, freq <span class="kw">in</span> items[:num]:
+        <span class="fn">print</span>(freq, word)</pre>
+</section>
+
+<section id="subtract">
+  <div class="section-label"><span class="dot"></span> Section 12.5</div>
+  <h2>Dictionary Subtraction</h2>
+  <div class="card"><h3>Spell-Checking via Set Difference</h3><p>Find words in the book that are <strong>not</strong> in a valid word list. Returns keys from <code>d1</code> missing from <code>d2</code>.</p></div>
+  <pre><span class="kw">def</span> <span class="fn">subtract</span>(d1, d2):
+    res = {}
+    <span class="kw">for</span> key <span class="kw">in</span> d1:
+        <span class="kw">if</span> key <span class="kw">not in</span> d2:
+            res[key] = d1[key]
+    <span class="kw">return</span> res</pre>
+</section>
+
+<section id="random">
+  <div class="section-label"><span class="dot"></span> Section 12.6</div>
+  <h2>Random Numbers</h2>
+  <div class="card"><h3>Pseudorandom Generation</h3><p>The <code>random</code> module provides <code>choice()</code> for uniform selection and <code>choices()</code> for weighted selection.</p></div>
+  <pre><span class="kw">import</span> random
+
+words = <span class="fn">list</span>(word_counter)
+weights = word_counter.<span class="fn">values</span>()
+
+<span class="cm"># Weighted sample &mdash; frequent words chosen more often</span>
+random_words = random.<span class="fn">choices</span>(words, weights=weights, k=<span class="num">6</span>)</pre>
+</section>
+
+<section id="bigrams">
+  <div class="section-label"><span class="dot"></span> Section 12.7</div>
+  <h2>Bigrams</h2>
+  <div class="card"><h3>What Is a Bigram?</h3><p>A <strong>bigram</strong> is a pair of consecutive words. By counting bigrams we capture which words tend to appear together.</p></div>
+  <div class="diagram">
+    <div style="font-size:.82rem;color:var(--muted);margin-bottom:10px">Sliding window over "man is not truly one"</div>
+    <div class="flow">
+      <div class="flow-box b1">man is</div>
+      <div class="flow-box b2">is not</div>
+      <div class="flow-box b3">not truly</div>
+      <div class="flow-box b4">truly one</div>
+    </div>
+  </div>
+  <pre><span class="kw">def</span> <span class="fn">process_word</span>(word):
+    window.<span class="fn">append</span>(word)
+    <span class="kw">if</span> <span class="fn">len</span>(window) == <span class="num">2</span>:
+        <span class="fn">count_bigram</span>(window)
+        window.<span class="fn">pop</span>(<span class="num">0</span>)</pre>
+</section>
+
+<section id="markov">
+  <div class="section-label"><span class="dot"></span> Section 12.8</div>
+  <h2>Markov Analysis</h2>
+  <div class="card"><h3>Successor Maps</h3><p>For each word, build a <strong>list of words that can follow it</strong>. If a successor appears multiple times, it's added multiple times &mdash; giving higher probability later.</p></div>
+  <div class="diagram">
+    <div style="font-size:.82rem;color:var(--muted);margin-bottom:10px">successor_map example</div>
+    <div style="display:inline-block;text-align:left;font-family:'JetBrains Mono',monospace;font-size:.8rem">
+      <span style="color:var(--accent)">"half"</span> &rarr; <span style="color:var(--accent3)">['a', 'not', 'the']</span><br>
+      <span style="color:var(--accent)">"a"</span>&nbsp;&nbsp;&nbsp;&nbsp; &rarr; <span style="color:var(--accent3)">['bee', 'vis']</span><br>
+      <span style="color:var(--accent)">"be"</span>&nbsp;&nbsp;&nbsp; &rarr; <span style="color:var(--accent3)">['but', 'vis']</span>
+    </div>
+  </div>
+  <pre><span class="kw">def</span> <span class="fn">add_bigram</span>(bigram):
+    first, second = bigram
+    <span class="kw">if</span> first <span class="kw">not in</span> successor_map:
+        successor_map[first] = [second]
+    <span class="kw">else</span>:
+        successor_map[first].<span class="fn">append</span>(second)</pre>
+</section>
+
+<section id="generate">
+  <div class="section-label"><span class="dot"></span> Section 12.9</div>
+  <h2>Generating Text</h2>
+  <div class="card"><h3>The Algorithm</h3><p>Pick a starting word. Look up its successors. Choose one at random. Use that word to look up the next set. Repeat. The result reads more like English than purely random words.</p></div>
+  <div class="diagram">
+    <div class="flow">
+      <div class="flow-box b2">Start word</div><span class="flow-arrow">&rarr;</span>
+      <div class="flow-box b3">Look up successors</div><span class="flow-arrow">&rarr;</span>
+      <div class="flow-box b4">random.choice()</div><span class="flow-arrow">&rarr;</span>
+      <div class="flow-box b1">Print &amp; repeat</div>
+    </div>
+  </div>
+  <div class="card"><h3>Improving Quality</h3><p>Use <strong>bigrams or trigrams as keys</strong> instead of single words. Longer keys = more context = more coherent text (but less variety). This is the core trade-off in Markov generation.</p></div>
+</section>
+
+<section id="glossary">
+  <div class="section-label"><span class="dot"></span> Reference</div>
+  <h2>Glossary</h2>
+  <div class="glassy">
+    <dl class="gloss-item"><dt>default value</dt><dd>The value assigned to a parameter if no argument is provided.</dd></dl>
+    <dl class="gloss-item"><dt>override</dt><dd>To replace a default value with an argument.</dd></dl>
+    <dl class="gloss-item"><dt>deterministic</dt><dd>A program that produces the same output given the same inputs, every time.</dd></dl>
+    <dl class="gloss-item"><dt>pseudorandom</dt><dd>Numbers that appear random but are generated by a deterministic algorithm.</dd></dl>
+    <dl class="gloss-item"><dt>bigram</dt><dd>A sequence of two consecutive elements (usually words).</dd></dl>
+    <dl class="gloss-item"><dt>trigram</dt><dd>A sequence of three consecutive elements.</dd></dl>
+    <dl class="gloss-item"><dt>n-gram</dt><dd>A sequence of n elements, where n is unspecified.</dd></dl>
+    <dl class="gloss-item"><dt>rubber duck debugging</dt><dd>Explaining a problem aloud (even to an object) to find the bug.</dd></dl>
+  </div>
+</section>
+
+<section id="quiz">
+  <div class="section-label"><span class="dot"></span> Test Yourself</div>
+  <h2>Quiz &mdash; Check Your Understanding</h2>
+
+  <div class="q-card" data-correct="2">
+    <div class="q-num">Question 1</div>
+    <div class="q-text">Why use a dictionary to track unique words instead of a list?</div>
+    <div class="q-options"><div class="q-opt" data-idx="0"><div class="radio"></div>Dictionaries are faster to print</div><div class="q-opt" data-idx="1"><div class="radio"></div>Lists cannot store strings</div><div class="q-opt" data-idx="2"><div class="radio"></div>Duplicate keys are automatically ignored, lookup is O(1)</div><div class="q-opt" data-idx="3"><div class="radio"></div>Dictionaries preserve insertion order</div></div>
+    <button class="check-btn">Check Answer</button>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="q-card" data-correct="1">
+    <div class="q-num">Question 2</div>
+    <div class="q-text">What does <code>word.strip(punctuation)</code> remove?</div>
+    <div class="q-options"><div class="q-opt" data-idx="0"><div class="radio"></div>All punctuation everywhere in the word</div><div class="q-opt" data-idx="1"><div class="radio"></div>Punctuation only from beginning and end</div><div class="q-opt" data-idx="2"><div class="radio"></div>Only the first punctuation character</div><div class="q-opt" data-idx="3"><div class="radio"></div>Whitespace and punctuation from the middle</div></div>
+    <button class="check-btn">Check Answer</button>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="q-card" data-correct="0">
+    <div class="q-num">Question 3</div>
+    <div class="q-text">What happens the first time a new word is encountered in the frequency counter?</div>
+    <div class="q-options"><div class="q-opt" data-idx="0"><div class="radio"></div>Its count is set to 1</div><div class="q-opt" data-idx="1"><div class="radio"></div>Its count is set to 0</div><div class="q-opt" data-idx="2"><div class="radio"></div>It is appended to a list</div><div class="q-opt" data-idx="3"><div class="radio"></div>A KeyError is raised</div></div>
+    <button class="check-btn">Check Answer</button>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="q-card" data-correct="3">
+    <div class="q-num">Question 4</div>
+    <div class="q-text">What does the <code>subtract(d1, d2)</code> function return?</div>
+    <div class="q-options"><div class="q-opt" data-idx="0"><div class="radio"></div>Keys in both d1 and d2</div><div class="q-opt" data-idx="1"><div class="radio"></div>Keys from d2 not in d1</div><div class="q-opt" data-idx="2"><div class="radio"></div>The numeric difference of values</div><div class="q-opt" data-idx="3"><div class="radio"></div>Keys from d1 not in d2</div></div>
+    <button class="check-btn">Check Answer</button>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="q-card" data-correct="2">
+    <div class="q-num">Question 5</div>
+    <div class="q-text">How does <code>random.choices()</code> differ from <code>random.choice()</code>?</div>
+    <div class="q-options"><div class="q-opt" data-idx="0"><div class="radio"></div>choices() only works with dictionaries</div><div class="q-opt" data-idx="1"><div class="radio"></div>choice() can accept weights but choices() cannot</div><div class="q-opt" data-idx="2"><div class="radio"></div>choices() supports weighted probabilities and selecting multiple items</div><div class="q-opt" data-idx="3"><div class="radio"></div>They are identical</div></div>
+    <button class="check-btn">Check Answer</button>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="q-card" data-correct="1">
+    <div class="q-num">Question 6</div>
+    <div class="q-text">What does <code>window.pop(0)</code> do after recording a bigram?</div>
+    <div class="q-options"><div class="q-opt" data-idx="0"><div class="radio"></div>Removes the last word from the window</div><div class="q-opt" data-idx="1"><div class="radio"></div>Removes the first word so the next word can slide in</div><div class="q-opt" data-idx="2"><div class="radio"></div>Clears the entire window</div><div class="q-opt" data-idx="3"><div class="radio"></div>Copies the window to a new list</div></div>
+    <button class="check-btn">Check Answer</button>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="q-card" data-correct="0">
+    <div class="q-num">Question 7</div>
+    <div class="q-text">Why is the same word sometimes added to a Markov successor list multiple times?</div>
+    <div class="q-options"><div class="q-opt" data-idx="0"><div class="radio"></div>So it has higher probability of being chosen randomly</div><div class="q-opt" data-idx="1"><div class="radio"></div>It's a bug &mdash; duplicates should be removed</div><div class="q-opt" data-idx="2"><div class="radio"></div>Python requires list elements to be unique</div><div class="q-opt" data-idx="3"><div class="radio"></div>To make the dictionary use less memory</div></div>
+    <button class="check-btn">Check Answer</button>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="q-card" data-correct="2">
+    <div class="q-num">Question 8</div>
+    <div class="q-text">How can you improve the coherence of Markov-generated text?</div>
+    <div class="q-options"><div class="q-opt" data-idx="0"><div class="radio"></div>Use shorter keys (single characters)</div><div class="q-opt" data-idx="1"><div class="radio"></div>Remove all punctuation from the output</div><div class="q-opt" data-idx="2"><div class="radio"></div>Use bigrams or trigrams as keys</div><div class="q-opt" data-idx="3"><div class="radio"></div>Choose words alphabetically</div></div>
+    <button class="check-btn">Check Answer</button>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="q-card" data-correct="1">
+    <div class="q-num">Question 9</div>
+    <div class="q-text">What is the purpose of <code>num=5</code> in <code>def print_most_common(word_counter, num=5)</code>?</div>
+    <div class="q-options"><div class="q-opt" data-idx="0"><div class="radio"></div>num can never be changed</div><div class="q-opt" data-idx="1"><div class="radio"></div>It gives num a default value callers can override</div><div class="q-opt" data-idx="2"><div class="radio"></div>It assigns 5 to a global variable</div><div class="q-opt" data-idx="3"><div class="radio"></div>It limits the dictionary to 5 entries</div></div>
+    <button class="check-btn">Check Answer</button>
+    <div class="q-feedback"></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+// Nav highlight on scroll
+(function(){
+  const pills = document.querySelectorAll('nav a');
+  const sections = document.querySelectorAll('section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        pills.forEach(p => p.classList.remove('active'));
+        const pill = document.querySelector('nav a[href="#' + e.target.id + '"]');
+        if (pill) pill.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-80px 0px -60% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
+
+// Quiz logic
+document.querySelectorAll('.q-card').forEach(card => {
+  const correct = parseInt(card.dataset.correct);
+  const options = card.querySelectorAll('.q-opt');
+  const btn = card.querySelector('.check-btn');
+  const feedback = card.querySelector('.q-feedback');
+  let selected = null, answered = false;
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      options.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selected = parseInt(opt.dataset.idx);
+      btn.classList.add('enabled');
+    });
+  });
+  btn.addEventListener('click', () => {
+    if (selected === null || answered) return;
+    answered = true;
+    options.forEach(o => {
+      const idx = parseInt(o.dataset.idx);
+      if (idx === correct) o.classList.add('correct');
+      else if (idx === selected && idx !== correct) o.classList.add('wrong');
+      o.classList.remove('selected');
+    });
+    feedback.textContent = selected === correct ? 'Correct!' : 'Not quite &mdash; the correct answer is highlighted above.';
+    feedback.className = 'q-feedback show ' + (selected === correct ? 'right' : 'wrong-fb');
+    btn.style.display = 'none';
+  });
+});
+</script>
+</body>
+</html>

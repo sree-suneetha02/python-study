@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 14 — Classes & Functions | Python Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e1117; --surface: #161b22; --surface2: #1c2333;
+  --border: #2a3142; --text: #c9d1d9; --text-dim: #6b7b8d;
+  --accent: #58a6ff; --accent-glow: rgba(88,166,255,0.15);
+  --green: #3fb950; --green-glow: rgba(63,185,80,0.12);
+  --orange: #d29922; --red: #f85149; --purple: #bc8cff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Source Sans 3',sans-serif;font-weight:300;line-height:1.65}
+header{padding:3rem 2rem 1.5rem;text-align:center;position:relative;overflow:hidden}
+header::before{content:'';position:absolute;top:-40%;left:-10%;width:120%;height:200%;background:radial-gradient(ellipse at 50% 0%,var(--accent-glow) 0%,transparent 60%);pointer-events:none}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;color:#fff;position:relative;letter-spacing:-0.02em}
+header h1 span{color:var(--accent)}
+header p{margin-top:.6rem;color:var(--text-dim);font-size:1.05rem;position:relative}
+nav{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;padding:.5rem 1rem 1rem;position:sticky;top:0;z-index:100;background:rgba(14,17,23,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+nav a{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-size:.78rem;padding:.4rem .9rem;border-radius:999px;cursor:pointer;transition:all .25s;text-decoration:none}
+nav a:hover{border-color:var(--accent);color:var(--text)}
+main{max-width:860px;margin:0 auto;padding:0 1.5rem 4rem}
+section{padding:2.5rem 0;border-bottom:1px solid var(--border);display:none}
+section.visible{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff;margin-bottom:.3rem}
+.section-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--accent);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.4rem}
+p{color:var(--text);font-size:.95rem;margin-bottom:1rem;line-height:1.7}
+h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:#fff;margin:1.5rem 0 .6rem}
+code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:var(--surface2);padding:.15em .4em;border-radius:4px;color:var(--purple)}
+pre{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem 1.2rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;overflow-x:auto;margin:1rem 0;line-height:1.6;color:#e6edf3}
+.concept-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:1rem 1.2rem;margin:1rem 0}
+.concept-card h4{font-weight:600;font-size:.88rem;color:var(--accent);margin-bottom:.3rem}
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.8rem;margin-top:1rem}
+.glossary-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem}
+.glossary-item strong{color:var(--accent);font-size:.85rem;display:block;margin-bottom:.2rem}
+.glossary-item span{font-size:.82rem;color:var(--text-dim)}
+.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.3rem 1.4rem;margin:1rem 0}
+.quiz-card .q-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
+.quiz-card .q-text{font-size:.98rem;color:#fff;margin-bottom:1rem}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem}
+.quiz-options button{text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;color:var(--text);font-size:.9rem;cursor:pointer;transition:all .2s;font-family:'Source Sans 3',sans-serif}
+.quiz-options button:hover:not(.chosen){border-color:var(--accent);background:var(--accent-glow)}
+.quiz-options button.correct{border-color:var(--green);background:var(--green-glow);color:var(--green)}
+.quiz-options button.wrong{border-color:var(--red);background:rgba(248,81,73,.1);color:var(--red)}
+.quiz-options button.chosen{pointer-events:none}
+.quiz-feedback{margin-top:.6rem;font-size:.85rem;color:var(--text-dim);display:none}
+.quiz-feedback.show{display:block;animation:fadeUp .3s ease}
+@media(max-width:600px){header{padding:2rem 1rem 1rem}main{padding:0 1rem 3rem}nav a{font-size:.7rem;padding:.3rem .7rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Chapter 14 — <span>Classes &amp; Functions</span></h1>
+  <p>Object-Oriented Programming Foundations in Python</p>
+</header>
+
+<nav id="navBar"></nav>
+
+<main id="mainContent"></main>
+
+<script>
+const sections = [
+  {id:"types",nav:"Defining Types",num:"14.1",title:"Programmer-defined Types",
+   body:`<p>A <strong>class</strong> is a programmer-defined type. Defining a class creates a <em>class object</em> that acts as a factory for creating new objects. Creating a new object is called <em>instantiation</em>, and the object is an <em>instance</em> of the class.</p>
+<pre>class Time:
+    """Represents a time of day."""
+    pass
+
+lunch = Time()
+print(type(lunch))   # &lt;class '__main__.Time'&gt;</pre>
+<div class="concept-card"><h4>Key Idea</h4><p>The class is the blueprint; each instance is a concrete thing built from that blueprint.</p></div>`},
+  {id:"attributes",nav:"Attributes",num:"14.2",title:"Attributes",
+   body:`<p>Objects can hold variables called <strong>attributes</strong>. You create and access them with dot notation.</p>
+<pre>lunch.hour = 11
+lunch.minute = 59
+lunch.second = 1
+
+f'{lunch.hour}:{lunch.minute:02d}:{lunch.second:02d}'
+# '11:59:01'</pre>
+<div class="concept-card"><h4>Format Specifiers</h4><p><code>:02d</code> means "display as at least 2 digits, padded with leading zeros."</p></div>`},
+  {id:"return",nav:"Return Values",num:"14.3",title:"Objects as Return Values",
+   body:`<p>Functions can <strong>create and return</strong> objects. A common pattern is a "factory function."</p>
+<pre>def make_time(hour, minute, second):
+    time = Time()
+    time.hour = hour
+    time.minute = minute
+    time.second = second
+    return time
+
+t = make_time(11, 59, 1)
+print_time(t)   # 11:59:01</pre>
+<div class="concept-card"><h4>Note</h4><p>Parameter names can match attribute names &mdash; inside the function <code>hour</code> is the parameter, <code>time.hour</code> is the attribute.</p></div>`},
+  {id:"mutable",nav:"Mutable",num:"14.4",title:"Objects Are Mutable",
+   body:`<p>You can modify an object's attributes after creation. If you pass an object to a function, the function receives a <em>reference</em> &mdash; changes inside the function affect the original.</p>
+<pre>def increment_time(time, hours, minutes, seconds):
+    time.hour += hours
+    time.minute += minutes
+    time.second += seconds
+
+start = make_time(9, 20, 0)
+increment_time(start, 1, 32, 0)
+print_time(start)   # 10:52:00</pre>
+<div class="concept-card"><h4>Aliasing Warning</h4><p>Inside <code>increment_time</code>, the parameter <code>time</code> is an alias for <code>start</code>. Modifying <code>time</code> modifies <code>start</code>.</p></div>`},
+  {id:"copy",nav:"Copying",num:"14.5",title:"Copying",
+   body:`<p>Use <code>copy.copy()</code> to duplicate an object so you can modify the duplicate without affecting the original.</p>
+<pre>from copy import copy
+
+start = make_time(9, 20, 0)
+end = copy(start)
+
+start is end    # False  &mdash; different objects
+start == end    # False  &mdash; default == checks identity!</pre>
+<div class="concept-card"><h4>== vs is</h4><p>For programmer-defined classes, <code>==</code> defaults to identity checking (same as <code>is</code>).</p></div>`},
+  {id:"pure",nav:"Pure Functions",num:"14.6",title:"Pure Functions",
+   body:`<p>A <strong>pure function</strong> doesn't modify its arguments &mdash; it returns a new value instead. They're easier to reason about and less error-prone.</p>
+<pre>def add_time(time, hours, minutes, seconds):
+    total = copy(time)
+    increment_time(total, hours, minutes, seconds)
+    return total
+
+end = add_time(start, 1, 32, 0)
+print_time(end)    # 10:52:00
+print_time(start)  # 09:20:00  &larr; unchanged!</pre>
+<div class="concept-card"><h4>Functional Style</h4><p>Write pure functions whenever reasonable. They make programs easier to test and debug.</p></div>`},
+  {id:"prototype",nav:"Prototype & Patch",num:"14.7",title:"Prototype and Patch",
+   body:`<p>Start with a simple prototype, test it, and fix bugs as you find them. The first version of <code>increment_time</code> didn't handle carry-over past 60. A robust fix uses <code>divmod</code>:</p>
+<pre>def increment_time(time, hours, minutes, seconds):
+    time.hour += hours
+    time.minute += minutes
+    time.second += seconds
+    carry, time.second = divmod(time.second, 60)
+    carry, time.minute = divmod(time.minute + carry, 60)
+    carry, time.hour = divmod(time.hour + carry, 24)</pre>
+<div class="concept-card"><h4>Prototype &amp; Patch</h4><p>Effective when you don't fully understand the problem yet, but can produce complex code with hidden edge cases.</p></div>`},
+  {id:"design",nav:"Design-first",num:"14.8",title:"Design-first Development",
+   body:`<p>Instead of patching, find a deeper insight. A <code>Time</code> is really a base-60 number. Convert to/from total seconds and let integer arithmetic handle everything.</p>
+<pre>def time_to_int(time):
+    minutes = time.hour * 60 + time.minute
+    seconds = minutes * 60 + time.second
+    return seconds
+
+def int_to_time(seconds):
+    minute, second = divmod(seconds, 60)
+    hour, minute = divmod(minute, 60)
+    return make_time(hour, minute, second)</pre>
+<div class="concept-card"><h4>Key Insight</h4><p>Sometimes making a problem <em>more general</em> makes it <em>easier</em> &mdash; fewer special cases, fewer bugs.</p></div>`},
+  {id:"debug",nav:"Debugging",num:"14.9",title:"Debugging",
+   body:`<p>Python gives you several introspection tools for working with objects:</p>
+<pre>type(start)                  # &lt;class '__main__.Time'&gt;
+isinstance(end, Time)        # True
+hasattr(start, 'hour')       # True
+vars(start)                  # {'hour': 9, 'minute': 40, 'second': 0}</pre>
+<div class="concept-card"><h4>Toolbox</h4><p><code>type()</code> &mdash; what class? &middot; <code>isinstance()</code> &mdash; is it this class? &middot; <code>hasattr()</code> &mdash; does it have this attribute? &middot; <code>vars()</code> &mdash; all attributes as a dict.</p></div>`},
+  {id:"glossary",nav:"Glossary",num:"14.10",title:"Glossary",
+   body:`<div class="glossary-grid">
+<div class="glossary-item"><strong>class</strong><span>A programmer-defined type; its definition creates a class object.</span></div>
+<div class="glossary-item"><strong>instantiation</strong><span>Creating an object that belongs to a class.</span></div>
+<div class="glossary-item"><strong>instance</strong><span>An object that belongs to a class.</span></div>
+<div class="glossary-item"><strong>attribute</strong><span>A variable associated with an object (instance variable).</span></div>
+<div class="glossary-item"><strong>object diagram</strong><span>A diagram showing an object, its attributes, and their values.</span></div>
+<div class="glossary-item"><strong>format specifier</strong><span>In an f-string, controls how a value is converted to a string.</span></div>
+<div class="glossary-item"><strong>pure function</strong><span>A function with no side effects &mdash; only returns a value.</span></div>
+<div class="glossary-item"><strong>functional style</strong><span>Programming approach that favors pure functions.</span></div>
+<div class="glossary-item"><strong>prototype &amp; patch</strong><span>Develop by starting rough and fixing bugs incrementally.</span></div>
+<div class="glossary-item"><strong>design-first</strong><span>Plan with insight before coding to avoid complex patches.</span></div>
+</div>`},
+  {id:"quiz",nav:"Quiz",num:"14.11",title:"Test Your Knowledge",
+   body:`<div id="quizContainer"></div>`}
+];
+
+const quizData = [
+  {topic:"types",q:"What does calling <code>Time()</code> do?",opts:["Defines a new class called Time","Creates (instantiates) a new Time object","Imports the Time module","Prints the current time"],correct:1,explain:"Calling the class name like a function creates a new instance of that class."},
+  {topic:"attributes",q:"What does <code>:02d</code> do inside an f-string?",opts:["Rounds to 2 decimal places","Displays as a 2-digit integer with leading zero if needed","Converts to binary with 2 bits","Pads the string with 2 trailing spaces"],correct:1,explain:":02d formats as a decimal integer padded to at least 2 characters with leading zeros."},
+  {topic:"mutable",q:"If a function modifies a <code>Time</code> object passed as a parameter, what happens to the original?",opts:["Nothing &mdash; Python passes a copy","It's also modified &mdash; the parameter is an alias","A TypeError is raised","Only local attributes change"],correct:1,explain:"Python passes object references, so the parameter is an alias for the original object."},
+  {topic:"copy",q:"For programmer-defined classes, what does <code>==</code> check by default?",opts:["Whether attributes are equal","Whether the objects are the same instance (identity)","Whether the class names match","It raises NotImplementedError"],correct:1,explain:"By default, == checks identity (same object in memory), not attribute equivalence."},
+  {topic:"pure",q:"Which best describes a <strong>pure function</strong>?",opts:["A function that uses no parameters","A function that modifies its arguments in place","A function that only returns a value without side effects","A function defined inside a class"],correct:2,explain:"A pure function doesn't modify its arguments and has no side effects."},
+  {topic:"design",q:"In design-first development, what insight simplifies time arithmetic?",opts:["Times should be stored as strings","Times are base-60 numbers convertible to total seconds","All time operations should use recursion","divmod should never be used with time"],correct:1,explain:"Treating a Time as a base-60 number and converting to/from total seconds lets you use simple integer arithmetic."},
+  {topic:"prototype",q:"What is the main risk of 'prototype and patch'?",opts:["It never produces working code","It only works for pure functions","It can produce needlessly complex code with hidden bugs","It requires converting to base 60"],correct:2,explain:"Prototype and patch can lead to complex code full of special-case fixes."},
+  {topic:"debug",q:"Which built-in function returns all attributes of an object as a dict?",opts:["<code>dir()</code>","<code>attrs()</code>","<code>vars()</code>","<code>inspect()</code>"],correct:2,explain:"vars(obj) returns {'hour': 9, 'minute': 40, 'second': 0}."}
+];
+
+const nav = document.getElementById('navBar');
+const main = document.getElementById('mainContent');
+
+function render() {
+  nav.innerHTML = '';
+  main.innerHTML = '';
+  sections.forEach(sec => {
+    const a = document.createElement('a');
+    a.textContent = sec.nav;
+    a.href = '#';
+    a.onclick = (e) => { e.preventDefault(); showSection(sec.id); };
+    nav.appendChild(a);
+    const div = document.createElement('div');
+    div.className = 'section';
+    div.id = 'sec-' + sec.id;
+    div.innerHTML = '<div class="section-num">' + sec.num + '</div><div class="section-title">' + sec.title + '</div>' + sec.body;
+    main.appendChild(div);
+  });
+  showSection(sections[0].id);
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('nav a').forEach(b => b.style.color = '');
+  const sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('visible');
+  const link = Array.from(document.querySelectorAll('nav a')).find(a => a.textContent === sections.find(s => s.id === id).nav);
+  if (link) link.style.color = 'var(--accent)';
+  if (id === 'quiz') renderQuiz();
+}
+
+function renderQuiz() {
+  const container = document.getElementById('quizContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  quizData.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'quiz-card';
+    card.innerHTML = '<div class="q-label">Question ' + (i+1) + ' &middot; &sect;' + (sections.find(s=>s.id===q.topic)?.num||'') + '</div><div class="q-text">' + q.q + '</div><div class="quiz-options" id="qopts-' + i + '">' + q.opts.map((o,j) => '<button onclick="answer(' + i + ',' + j + ')">' + o + '</button>').join('') + '</div><div class="quiz-feedback" id="qfb-' + i + '">' + q.explain + '</div>';
+    container.appendChild(card);
+  });
+}
+
+function answer(qi, chosen) {
+  const opts = document.getElementById('qopts-'+qi);
+  const fb = document.getElementById('qfb-'+qi);
+  const buttons = opts.querySelectorAll('button');
+  buttons.forEach((b,j) => {
+    b.classList.add('chosen');
+    if (j === quizData[qi].correct) b.classList.add('correct');
+    if (j === chosen && j !== quizData[qi].correct) b.classList.add('wrong');
+  });
+  fb.classList.add('show');
+}
+
+render();
+</script>
+</body>
+</html>
