@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Constructors — Interactive Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Code+Pro:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181b24;
+    --surface-raised: #1e222e;
+    --border: #2a2f3e;
+    --text: #e4e6ef;
+    --text-muted: #8b90a5;
+    --accent: #6ee7b7;
+    --accent-dim: #2d6a55;
+    --accent-glow: rgba(110, 231, 183, 0.12);
+    --code-bg: #141720;
+    --yellow: #fbbf24;
+    --blue: #60a5fa;
+    --pink: #f472b6;
+    --orange: #fb923c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── Hero ─────────────────────────────── */
+  .hero {
+    position: relative;
+    padding: 100px 24px 80px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-label {
+    display: inline-block;
+    font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    padding: 6px 18px; border-radius: 100px;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900; font-size: clamp(2.6rem, 6vw, 4.2rem);
+    line-height: 1.15;
+    background: linear-gradient(135deg, var(--text) 40%, var(--accent) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 18px;
+  }
+  .hero p {
+    max-width: 620px; margin: 0 auto;
+    color: var(--text-muted); font-size: 17px;
+  }
+  .updated {
+    margin-top: 16px; font-size: 13px; color: var(--text-muted);
+    opacity: .6;
+  }
+
+  /* ── Container ────────────────────────── */
+  .container { max-width: 820px; margin: 0 auto; padding: 0 24px 100px; }
+
+  /* ── Section ──────────────────────────── */
+  .section {
+    margin-bottom: 56px;
+    animation: fadeUp .6s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .section:nth-child(2) { animation-delay: .1s; }
+  .section:nth-child(3) { animation-delay: .15s; }
+  .section:nth-child(4) { animation-delay: .2s; }
+  .section:nth-child(5) { animation-delay: .25s; }
+
+  .section-number {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px; font-weight: 600;
+    color: var(--accent); opacity: .7;
+    margin-bottom: 6px;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700; font-size: 28px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  h2::after {
+    content: '';
+    display: block;
+    width: 48px; height: 3px;
+    background: var(--accent);
+    border-radius: 3px;
+    margin-top: 10px;
+  }
+  h3 {
+    font-size: 20px; font-weight: 700;
+    margin: 32px 0 12px;
+    color: var(--yellow);
+  }
+  p { margin-bottom: 14px; }
+
+  /* ── Code Block ───────────────────────── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0;
+    margin: 20px 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .code-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .code-header .dots span {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%; margin-right: 6px;
+  }
+  .code-header .dots span:nth-child(1) { background: #ff5f57; }
+  .code-header .dots span:nth-child(2) { background: #febc2e; }
+  .code-header .dots span:nth-child(3) { background: #28c840; }
+  pre {
+    padding: 20px 22px;
+    overflow-x: auto;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px; line-height: 1.8;
+    color: var(--text);
+  }
+  .code-block .output-section {
+    border-top: 1px dashed var(--border);
+    padding: 14px 22px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    background: rgba(110,231,183,.03);
+  }
+  .output-label {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-muted); letter-spacing: 1.5px;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+
+  /* ── Syntax Colors ────────────────────── */
+  .kw  { color: var(--pink); }
+  .fn  { color: var(--blue); }
+  .str { color: var(--accent); }
+  .cm  { color: var(--text-muted); font-style: italic; }
+  .slf { color: var(--orange); }
+  .cls { color: var(--yellow); }
+
+  /* ── Comparison Table ─────────────────── */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  @media (max-width: 600px) { .comparison { grid-template-columns: 1fr; } }
+  .compare-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    transition: border-color .3s;
+  }
+  .compare-card:hover { border-color: var(--accent-dim); }
+  .compare-card h4 {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px; font-weight: 600;
+    margin-bottom: 14px;
+    color: var(--blue);
+  }
+  .compare-card ul { list-style: none; }
+  .compare-card li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .compare-card li::before {
+    content: '→';
+    position: absolute; left: 0;
+    color: var(--accent);
+  }
+
+  /* ── Q&A Section ──────────────────────── */
+  .qa-section {
+    margin-top: 64px;
+  }
+  .qa-section h2::after { background: var(--yellow); }
+
+  .qa-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: border-color .3s, box-shadow .3s;
+  }
+  .qa-card:hover {
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 30px var(--accent-glow);
+  }
+  .qa-question {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .qa-question .q-num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-glow);
+    color: var(--accent);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px; font-weight: 700;
+    border-radius: 8px;
+  }
+  .qa-question .q-text { flex: 1; }
+  .qa-question .q-toggle {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    font-size: 18px; color: var(--text-muted);
+    transition: transform .3s, background .3s, color .3s;
+  }
+  .qa-card.open .q-toggle {
+    transform: rotate(45deg);
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .qa-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .4s ease, padding .3s ease;
+  }
+  .qa-card.open .qa-answer {
+    max-height: 600px;
+    padding: 0 24px 20px 70px;
+  }
+  .qa-answer p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+
+  /* ── Note Callout ─────────────────────── */
+  .note {
+    background: rgba(251, 191, 36, .06);
+    border-left: 3px solid var(--yellow);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .note strong { color: var(--yellow); }
+
+  /* ── Footer ───────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    opacity: .5;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<header class="hero">
+  <div class="hero-label">Python OOP</div>
+  <h1>Constructors in Python</h1>
+  <p>Understanding how objects are created and initialized — from <code>__new__</code> to <code>__init__</code>, default to parameterized.</p>
+  <div class="updated">Last Updated: 11 Jul 2025</div>
+</header>
+
+<div class="container">
+
+  <!-- ═══ SECTION 1 ═══ -->
+  <div class="section">
+    <div class="section-number">01</div>
+    <h2>What is a Constructor?</h2>
+    <p>In Python, a <strong>constructor</strong> is a special method that is called automatically when an object is created from a class. Its main role is to <em>initialize</em> the object by setting up its attributes or state.</p>
+    <p>Two methods work together to manage object creation and initialization:</p>
+    <p><code>__new__</code> is the constructor that <strong>creates</strong> a new instance of the class, while <code>__init__</code> is the initializer that <strong>sets up</strong> the instance's attributes after creation.</p>
+  </div>
+
+  <!-- ═══ SECTION 2 ═══ -->
+  <div class="section">
+    <div class="section-number">02</div>
+    <h2>The <code>__new__</code> Method</h2>
+    <p>This method is responsible for creating a new instance of a class. It allocates memory and returns the new object. It is called <strong>before</strong> <code>__init__</code>.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span>python</span>
+      </div>
+      <pre><span class="kw">class</span> <span class="cls">ClassName</span>:
+    <span class="kw">def</span> <span class="fn">__new__</span>(<span class="slf">cls</span>, parameters):
+        instance = <span class="fn">super</span>(<span class="cls">ClassName</span>, <span class="slf">cls</span>).__new__(<span class="slf">cls</span>)
+        <span class="kw">return</span> instance</pre>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 3 ═══ -->
+  <div class="section">
+    <div class="section-number">03</div>
+    <h2>The <code>__init__</code> Method</h2>
+    <p>This method initializes the newly created instance. It is called immediately after the object is created by <code>__new__</code> and is responsible for initializing attributes of the instance.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span>python</span>
+      </div>
+      <pre><span class="kw">class</span> <span class="cls">ClassName</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="slf">self</span>, parameters):
+        <span class="slf">self</span>.attribute = value</pre>
+    </div>
+
+    <div class="note">
+      <strong>Note:</strong> <code>__init__</code> is called after <code>__new__</code> and does not return anything — it returns <code>None</code> by default.
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 4 ═══ -->
+  <div class="section">
+    <div class="section-number">04</div>
+    <h2>__init__ vs __new__</h2>
+
+    <div class="comparison">
+      <div class="compare-card">
+        <h4>__new__</h4>
+        <ul>
+          <li>Creates a new instance of the class</li>
+          <li>Allocates memory for the object</li>
+          <li>Called before <code>__init__</code></li>
+          <li>Rarely overridden — useful for singletons &amp; immutable types</li>
+        </ul>
+      </div>
+      <div class="compare-card">
+        <h4>__init__</h4>
+        <ul>
+          <li>Initializes the created object</li>
+          <li>Sets attribute values and state</li>
+          <li>Called immediately after <code>__new__</code></li>
+          <li>The most commonly used constructor method</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 5 ═══ -->
+  <div class="section">
+    <div class="section-number">05</div>
+    <h2>Types of Constructors</h2>
+
+    <h3>① Default Constructor</h3>
+    <p>A default constructor does not take any parameters other than <code>self</code>. It initializes the object with default attribute values.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span>python</span>
+      </div>
+      <pre><span class="kw">class</span> <span class="cls">Car</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="slf">self</span>):
+        <span class="cm"># Initialize the Car with default attributes</span>
+        <span class="slf">self</span>.make  = <span class="str">"Toyota"</span>
+        <span class="slf">self</span>.model = <span class="str">"Corolla"</span>
+        <span class="slf">self</span>.year  = <span class="str">2020</span>
+
+<span class="cm"># Creating an instance using the default constructor</span>
+car = <span class="cls">Car</span>()
+<span class="fn">print</span>(car.make)
+<span class="fn">print</span>(car.model)
+<span class="fn">print</span>(car.year)</pre>
+      <div class="output-section">
+        <div class="output-label">Output</div>
+        Toyota<br>Corolla<br>2020
+      </div>
+    </div>
+
+    <h3>② Parameterized Constructor</h3>
+    <p>A parameterized constructor accepts arguments to initialize the object's attributes with specific values provided at creation time.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span>python</span>
+      </div>
+      <pre><span class="kw">class</span> <span class="cls">Car</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="slf">self</span>, make, model, year):
+        <span class="cm"># Initialize the Car with specific attributes</span>
+        <span class="slf">self</span>.make  = make
+        <span class="slf">self</span>.model = model
+        <span class="slf">self</span>.year  = year
+
+<span class="cm"># Creating an instance using the parameterized constructor</span>
+car = <span class="cls">Car</span>(<span class="str">"Honda"</span>, <span class="str">"Civic"</span>, <span class="str">2022</span>)
+<span class="fn">print</span>(car.make)
+<span class="fn">print</span>(car.model)
+<span class="fn">print</span>(car.year)</pre>
+      <div class="output-section">
+        <div class="output-label">Output</div>
+        Honda<br>Civic<br>2022
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Q&A SECTION ═══ -->
+  <div class="section qa-section">
+    <div class="section-number">06</div>
+    <h2>Test Your Understanding</h2>
+    <p style="margin-bottom: 28px; color: var(--text-muted);">Click a question to reveal the answer.</p>
+
+    <div class="qa-card" onclick="this.classList.toggle('open')">
+      <div class="qa-question">
+        <span class="q-num">Q1</span>
+        <span class="q-text">What happens if you define two <code>__init__</code> methods in the same class?</span>
+        <span class="q-toggle">+</span>
+      </div>
+      <div class="qa-answer">
+        <p>Python does not support method overloading in the traditional sense. If you define two <code>__init__</code> methods, the <strong>second one overwrites the first</strong>. Only the last defined <code>__init__</code> will be used. To handle multiple signatures, use default arguments or <code>*args</code> / <code>**kwargs</code>.</p>
+      </div>
+    </div>
+
+    <div class="qa-card" onclick="this.classList.toggle('open')">
+      <div class="qa-question">
+        <span class="q-num">Q2</span>
+        <span class="q-text">Can <code>__init__</code> return a value other than <code>None</code>?</span>
+        <span class="q-toggle">+</span>
+      </div>
+      <div class="qa-answer">
+        <p>No. If you try to return anything other than <code>None</code> from <code>__init__</code>, Python will raise a <code>TypeError</code>: <em>"__init__() should return None, not 'int'"</em>. The <code>__init__</code> method is strictly for initialization, not creation.</p>
+      </div>
+    </div>
+
+    <div class="qa-card" onclick="this.classList.toggle('open')">
+      <div class="qa-question">
+        <span class="q-num">Q3</span>
+        <span class="q-text">When would you need to override <code>__new__</code> instead of <code>__init__</code>?</span>
+        <span class="q-toggle">+</span>
+      </div>
+      <div class="qa-answer">
+        <p>You override <code>__new__</code> when you need to control <strong>object creation</strong> itself — for example, implementing the <strong>Singleton pattern</strong> (ensuring only one instance exists), subclassing immutable types like <code>int</code>, <code>str</code>, or <code>tuple</code>, or implementing custom metaclass behavior.</p>
+      </div>
+    </div>
+
+    <div class="qa-card" onclick="this.classList.toggle('open')">
+      <div class="qa-question">
+        <span class="q-num">Q4</span>
+        <span class="q-text">What is the difference between a class attribute and an instance attribute set in <code>__init__</code>?</span>
+        <span class="q-toggle">+</span>
+      </div>
+      <div class="qa-answer">
+        <p>A <strong>class attribute</strong> is shared across all instances and is defined directly in the class body. An <strong>instance attribute</strong> set in <code>__init__</code> is unique to each object. Modifying a class attribute affects all instances (unless shadowed), while instance attributes are independent.</p>
+      </div>
+    </div>
+
+    <div class="qa-card" onclick="this.classList.toggle('open')">
+      <div class="qa-question">
+        <span class="q-num">Q5</span>
+        <span class="q-text">How can you simulate constructor overloading in Python?</span>
+        <span class="q-toggle">+</span>
+      </div>
+      <div class="qa-answer">
+        <p>Since Python doesn't support multiple constructors, you can use <strong>default parameter values</strong>, <code>*args</code> / <code>**kwargs</code>, or the <code>@classmethod</code> decorator to create alternative factory methods like <code>Car.from_dict(data)</code> or <code>Car.from_string(s)</code>.</p>
+      </div>
+    </div>
+
+    <div class="qa-card" onclick="this.classList.toggle('open')">
+      <div class="qa-question">
+        <span class="q-num">Q6</span>
+        <span class="q-text">What does <code>super().__init__()</code> do inside a child class constructor?</span>
+        <span class="q-toggle">+</span>
+      </div>
+      <div class="qa-answer">
+        <p>It calls the <strong>parent class's <code>__init__</code></strong> method, ensuring the parent's attributes are properly initialized before the child adds its own. Without it, the child object may be missing attributes defined in the parent class.</p>
+      </div>
+    </div>
+
+    <div class="qa-card" onclick="this.classList.toggle('open')">
+      <div class="qa-question">
+        <span class="q-num">Q7</span>
+        <span class="q-text">Is <code>__init__</code> called if <code>__new__</code> returns an instance of a different class?</span>
+        <span class="q-toggle">+</span>
+      </div>
+      <div class="qa-answer">
+        <p>No. Python only calls <code>__init__</code> if <code>__new__</code> returns an instance of <strong>the same class</strong> (or its subclass). If <code>__new__</code> returns an object of a completely different type, <code>__init__</code> is <strong>skipped</strong>.</p>
+      </div>
+    </div>
+
+    <div class="qa-card" onclick="this.classList.toggle('open')">
+      <div class="qa-question">
+        <span class="q-num">Q8</span>
+        <span class="q-text">What happens if you forget to include <code>self</code> as the first parameter of <code>__init__</code>?</span>
+        <span class="q-toggle">+</span>
+      </div>
+      <div class="qa-answer">
+        <p>You'll get a <code>TypeError</code> when creating an instance because Python automatically passes the instance as the first argument. Without <code>self</code>, there's a mismatch in the expected number of arguments — e.g., <em>"__init__() takes 0 positional arguments but 1 was given"</em>.</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  Python Constructors — Interactive Guide
+</footer>
+
+</body>
+</html>

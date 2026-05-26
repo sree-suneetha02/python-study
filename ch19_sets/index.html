@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Sets – Learn &amp; Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#faf8f5;--card:#fff;--card-alt:#f5f1ec;--border:#e4ddd4;
+  --accent:#d4500a;--accent2:#1a7a4c;--accent3:#2563eb;
+  --text:#2c2418;--text-muted:#7a6e5d;--text-light:#a69880;
+  --code-bg:#1e1e2e;--code-text:#cdd6f4;
+  --tag-bg:#fef3cd;--tag-text:#856404;
+  --quiz-bg:#fefcf8;--quiz-border:#e8d5a3;
+  --correct-bg:#d4edda;--wrong-bg:#f8d7da;
+  --shadow:0 2px 12px rgba(44,36,24,.07);
+}
+body{
+  font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);
+  line-height:1.7;min-height:100vh;
+}
+
+/* === HEADER === */
+.page-header{
+  padding:56px 24px 40px;text-align:center;
+  background:linear-gradient(180deg,#f0ebe3 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);position:relative;
+}
+.page-header::before{
+  content:'{ }';position:absolute;top:20px;right:30px;
+  font-family:'JetBrains Mono',monospace;font-size:3rem;
+  color:rgba(212,80,10,.08);font-weight:700;
+}
+.page-header h1{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:clamp(2.2rem,5vw,3.4rem);letter-spacing:-1.5px;
+  color:var(--text);margin-bottom:8px;
+}
+.page-header h1 span{color:var(--accent);}
+.page-header p{font-size:1.05rem;color:var(--text-muted);max-width:540px;margin:0 auto;}
+.page-header .updated{
+  margin-top:12px;font-size:.78rem;color:var(--text-light);
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* === TOC === */
+.toc{
+  max-width:780px;margin:32px auto 0;padding:0 24px;
+}
+.toc-inner{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:24px 28px;box-shadow:var(--shadow);
+}
+.toc-title{font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:12px;}
+.toc-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;}
+.toc-list li a{
+  text-decoration:none;color:var(--text);font-size:.92rem;
+  display:flex;align-items:center;gap:8px;padding:4px 0;
+  transition:color .2s;
+}
+.toc-list li a:hover{color:var(--accent);}
+.toc-list li a::before{
+  content:'→';font-family:'JetBrains Mono',monospace;font-size:.75rem;
+  color:var(--text-light);transition:color .2s;
+}
+.toc-list li a:hover::before{color:var(--accent);}
+
+/* === MAIN CONTENT === */
+.content{max-width:780px;margin:0 auto;padding:20px 24px 60px;}
+
+/* Section */
+.section{
+  margin-top:48px;padding-top:32px;
+  border-top:1px solid var(--border);
+  animation:fadeIn .5s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+.section:first-child{border-top:none;margin-top:32px;}
+
+.section-num{
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  color:var(--accent);text-transform:uppercase;letter-spacing:3px;
+  margin-bottom:4px;
+}
+.section h2{
+  font-family:'Playfair Display',serif;font-weight:700;
+  font-size:1.65rem;letter-spacing:-0.5px;margin-bottom:14px;
+}
+.section p{margin-bottom:14px;font-size:.97rem;color:var(--text);}
+.section ul{margin:0 0 14px 20px;font-size:.95rem;}
+.section ul li{margin-bottom:6px;}
+.section ul li strong{color:var(--accent);}
+
+/* Code blocks */
+.code-block{
+  background:var(--code-bg);border-radius:10px;
+  margin:16px 0 10px;overflow:hidden;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+}
+.code-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 16px;background:rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.code-dots{display:flex;gap:6px;}
+.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots span:nth-child(1){background:#ff5f57;}
+.code-dots span:nth-child(2){background:#febc2e;}
+.code-dots span:nth-child(3){background:#28c840;}
+.code-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;}
+pre{
+  padding:16px 20px;font-family:'JetBrains Mono',monospace;
+  font-size:.82rem;line-height:1.75;color:var(--code-text);
+  overflow-x:auto;white-space:pre;
+}
+.kw{color:#cba6f7;} .fn{color:#89b4fa;} .st{color:#a6e3a1;} .cm{color:#6c7086;font-style:italic;} .num{color:#fab387;} .op{color:#89dceb;} .bi{color:#f9e2af;}
+
+/* Output block */
+.output-block{
+  background:var(--card-alt);border:1px solid var(--border);border-radius:8px;
+  padding:12px 18px;margin:0 0 18px;
+  font-family:'JetBrains Mono',monospace;font-size:.82rem;
+  color:var(--text);
+}
+.output-label{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-light);margin-bottom:4px;}
+
+/* Info callout */
+.callout{
+  background:#eef6ff;border-left:3px solid var(--accent3);
+  border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;
+  font-size:.9rem;color:#1e3a5f;
+}
+.callout.warn{background:#fef8e7;border-color:#d4a00a;color:#664d03;}
+
+/* Operator table */
+.op-table{
+  width:100%;border-collapse:collapse;margin:16px 0;
+  font-size:.88rem;
+}
+.op-table th{
+  background:var(--card-alt);text-align:left;padding:10px 14px;
+  border-bottom:2px solid var(--border);font-weight:700;
+  font-family:'JetBrains Mono',monospace;font-size:.8rem;
+  text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);
+}
+.op-table td{
+  padding:10px 14px;border-bottom:1px solid var(--border);
+}
+.op-table td:first-child{
+  font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:600;
+}
+.op-table tr:hover{background:rgba(212,80,10,.03);}
+
+/* === QUIZ CARD === */
+.quiz-card{
+  background:var(--quiz-bg);border:1px solid var(--quiz-border);
+  border-radius:12px;padding:24px 24px 20px;margin:24px 0 8px;
+  position:relative;overflow:hidden;
+}
+.quiz-card::before{
+  content:'Q';position:absolute;top:-8px;right:16px;
+  font-family:'Playfair Display',serif;font-size:5rem;font-weight:900;
+  color:rgba(212,80,10,.05);line-height:1;
+}
+.quiz-badge{
+  display:inline-block;padding:3px 10px;border-radius:6px;
+  background:var(--accent);color:#fff;font-size:.68rem;
+  font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+  margin-bottom:10px;
+}
+.quiz-text{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:6px;}
+.quiz-code{
+  background:var(--code-bg);color:var(--code-text);border-radius:8px;
+  padding:12px 16px;margin:10px 0 14px;
+  font-family:'JetBrains Mono',monospace;font-size:.8rem;
+  line-height:1.7;white-space:pre-wrap;
+}
+.quiz-options{display:flex;flex-direction:column;gap:8px;}
+.q-opt{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 16px;border:1px solid var(--border);border-radius:8px;
+  cursor:pointer;transition:all .2s;background:#fff;
+  font-size:.92rem;
+}
+.q-opt:hover{border-color:var(--accent);background:rgba(212,80,10,.03);transform:translateX(3px);}
+.q-opt.selected{border-color:var(--accent);background:rgba(212,80,10,.06);}
+.q-opt .q-letter{
+  flex-shrink:0;width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.78rem;
+  background:var(--card-alt);color:var(--text-muted);
+  transition:all .2s;
+}
+.q-opt.selected .q-letter{background:var(--accent);color:#fff;}
+
+/* Score area */
+.score-area{
+  max-width:780px;margin:40px auto;padding:0 24px;display:none;
+}
+.score-box{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:36px;text-align:center;box-shadow:var(--shadow);
+}
+.score-box h3{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:6px;}
+.score-big{font-family:'JetBrains Mono',monospace;font-size:3rem;font-weight:700;color:var(--accent);margin:10px 0;}
+.score-sub{color:var(--text-muted);font-size:.95rem;}
+
+.submit-bar{
+  max-width:780px;margin:30px auto 60px;padding:0 24px;
+  display:flex;justify-content:center;gap:12px;
+}
+.btn{
+  padding:14px 34px;border-radius:10px;border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:.92rem;
+  transition:all .25s;
+}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-2px);}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted);}
+.btn-outline:hover{border-color:var(--text);color:var(--text);}
+
+@media(max-width:600px){
+  .toc-list{grid-template-columns:1fr;}
+  .section h2{font-size:1.35rem;}
+  .quiz-card{padding:18px 16px;}
+  .op-table{font-size:.78rem;}
+  .op-table td,.op-table th{padding:8px 10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Python <span>Sets</span></h1>
+  <p>A complete guide to sets — properties, methods, operators, internals — with quiz questions to test yourself.</p>
+  <div class="updated">Last Updated: 22 May 2026</div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <div class="toc-inner">
+    <div class="toc-title">Contents</div>
+    <ol class="toc-list">
+      <li><a href="#basics">Creating a Set</a></li>
+      <li><a href="#typecasting">Type Casting with set()</a></li>
+      <li><a href="#unique">Unique &amp; Immutable Elements</a></li>
+      <li><a href="#heterogeneous">Heterogeneous Elements</a></li>
+      <li><a href="#frozenset">Frozen Sets</a></li>
+      <li><a href="#internals">Internal Working (Hash Table)</a></li>
+      <li><a href="#methods">Set Methods</a></li>
+      <li><a href="#operators">Set Operators</a></li>
+    </ol>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ========== 1. BASICS ========== -->
+<div class="section" id="basics">
+  <div class="section-num">Section 01</div>
+  <h2>Creating a Set</h2>
+  <p>A <strong>set</strong> stores a collection of items with these key properties:</p>
+  <ul>
+    <li><strong>No duplicate elements</strong> — inserting the same item again is silently ignored.</li>
+    <li><strong>Unordered collection</strong> — items have no specific order and cannot be accessed by index.</li>
+    <li><strong>Hashing internally</strong> — makes search, insert, and delete operations efficient.</li>
+    <li><strong>Mutable</strong> — you can add or remove elements, but cannot change individual elements directly.</li>
+  </ul>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre>s = {<span class="num">10</span>, <span class="num">50</span>, <span class="num">20</span>}
+<span class="bi">print</span>(s)
+<span class="bi">print</span>(<span class="bi">type</span>(s))</pre>
+  </div>
+  <div class="output-block">
+    <div class="output-label">Output</div>
+    {10, 50, 20}<br>&lt;class 'set'&gt;
+  </div>
+  <div class="callout">There is no specific order for set elements to be printed — you may see them in any arrangement.</div>
+
+  <!-- QUIZ -->
+  <div class="quiz-card" data-ans="1">
+    <div class="quiz-badge">Quiz</div>
+    <div class="quiz-text">Which of these is NOT a property of Python sets?</div>
+    <div class="quiz-options">
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">A</span> Unordered collection</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">B</span> Elements can be accessed by index</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">C</span> No duplicate elements allowed</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">D</span> Uses hashing internally</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 2. TYPE CASTING ========== -->
+<div class="section" id="typecasting">
+  <div class="section-num">Section 02</div>
+  <h2>Type Casting with set()</h2>
+  <p>The <code>set()</code> constructor converts other iterables — like lists, tuples, or strings — into a set, automatically removing duplicates.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre><span class="cm"># typecasting list to set</span>
+s = <span class="bi">set</span>([<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>])
+<span class="bi">print</span>(s)
+
+<span class="cm"># Adding element to the set</span>
+s.add(<span class="st">"d"</span>)
+<span class="bi">print</span>(s)</pre>
+  </div>
+  <div class="output-block">
+    <div class="output-label">Output</div>
+    {'c', 'b', 'a'}<br>{'d', 'c', 'b', 'a'}
+  </div>
+
+  <div class="quiz-card" data-ans="2">
+    <div class="quiz-badge">Quiz</div>
+    <div class="quiz-text">What is the output of the following code?</div>
+    <div class="quiz-code">s = set("banana")
+print(len(s))</div>
+    <div class="quiz-options">
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">A</span> 6</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">B</span> 4</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">C</span> 3</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">D</span> 1</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 3. UNIQUE & IMMUTABLE ========== -->
+<div class="section" id="unique">
+  <div class="section-num">Section 03</div>
+  <h2>Unique &amp; Immutable Elements</h2>
+  <p>Sets automatically discard duplicate values. While the set itself is mutable (you can add/remove), individual elements cannot be changed by assignment.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre><span class="cm"># a set cannot have duplicate values</span>
+s = {<span class="st">"Geeks"</span>, <span class="st">"for"</span>, <span class="st">"Geeks"</span>}
+<span class="bi">print</span>(s)
+
+<span class="cm"># values of a set cannot be changed</span>
+s[<span class="num">1</span>] = <span class="st">"Hello"</span>
+<span class="bi">print</span>(s)</pre>
+  </div>
+  <div class="output-block">
+    <div class="output-label">Output</div>
+    {'Geeks', 'for'}<br>TypeError: 'set' object does not support item assignment
+  </div>
+  <p><code>s = {"Geeks", "for", "Geeks"}</code> — the duplicate "Geeks" is removed, only unique values remain. <code>s[1] = "Hello"</code> raises a TypeError because set elements cannot be changed directly. Only <code>add()</code> or <code>remove()</code> can modify a set.</p>
+
+  <div class="quiz-card" data-ans="0">
+    <div class="quiz-badge">Quiz</div>
+    <div class="quiz-text">What will this code produce?</div>
+    <div class="quiz-code">s = {1, 2, 2, 3, 3, 3}
+print(s)</div>
+    <div class="quiz-options">
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">A</span> {1, 2, 3}</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">B</span> {1, 2, 2, 3, 3, 3}</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">C</span> Error</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">D</span> {3, 2, 1, 2, 3, 3}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 4. HETEROGENEOUS ========== -->
+<div class="section" id="heterogeneous">
+  <div class="section-num">Section 04</div>
+  <h2>Heterogeneous Elements</h2>
+  <p>Sets can store a mixture of different data types — strings, integers, floats, booleans — all in one set.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre>s = {<span class="st">"Geeks"</span>, <span class="st">"for"</span>, <span class="num">10</span>, <span class="num">52.7</span>, <span class="kw">True</span>}
+<span class="bi">print</span>(s)</pre>
+  </div>
+  <div class="output-block">
+    <div class="output-label">Output</div>
+    {True, 52.7, 'Geeks', 10, 'for'}
+  </div>
+
+  <div class="quiz-card" data-ans="1">
+    <div class="quiz-badge">Quiz</div>
+    <div class="quiz-text">What is the length of this set?</div>
+    <div class="quiz-code">s = {1, True, "1", 1.0}
+print(len(s))</div>
+    <div class="quiz-options">
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">A</span> 4</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">B</span> 2</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">C</span> 3</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">D</span> 1</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 5. FROZENSET ========== -->
+<div class="section" id="frozenset">
+  <div class="section-num">Section 05</div>
+  <h2>Frozen Sets</h2>
+  <p>A <strong>frozenset</strong> is an immutable version of a set. Its elements cannot be changed after creation, but you can perform operations like union, intersection, and difference. Use <code>frozenset()</code> to create one.</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre><span class="cm"># Normal set (mutable)</span>
+s = <span class="bi">set</span>([<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>])
+<span class="bi">print</span>(<span class="st">"Normal Set:"</span>, s)
+
+<span class="cm"># Frozen set (immutable)</span>
+fs = <span class="bi">frozenset</span>([<span class="st">"e"</span>, <span class="st">"f"</span>, <span class="st">"g"</span>])
+<span class="bi">print</span>(<span class="st">"Frozen Set:"</span>, fs)</pre>
+  </div>
+  <div class="output-block">
+    <div class="output-label">Output</div>
+    Normal Set: {'a', 'c', 'b'}<br>Frozen Set: frozenset({'e', 'g', 'f'})
+  </div>
+  <div class="callout">Frozensets are immutable, so methods like <code>add()</code> or <code>remove()</code> cannot be used. They are hashable, which allows them to be used as dictionary keys.</div>
+
+  <div class="quiz-card" data-ans="2">
+    <div class="quiz-badge">Quiz</div>
+    <div class="quiz-text">What happens when you run this code?</div>
+    <div class="quiz-code">fs = frozenset([1, 2, 3])
+fs.add(4)</div>
+    <div class="quiz-options">
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">A</span> fs becomes frozenset({1, 2, 3, 4})</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">B</span> fs stays frozenset({1, 2, 3})</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">C</span> AttributeError is raised</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">D</span> TypeError: unhashable type</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 6. INTERNALS ========== -->
+<div class="section" id="internals">
+  <div class="section-num">Section 06</div>
+  <h2>Internal Working (Hash Table)</h2>
+  <p>Python sets are implemented using a <strong>hash table</strong>, similar to dictionaries, where set elements are stored as keys with dummy values. When multiple elements map to the same index, Python handles the collision using chaining.</p>
+  <ul>
+    <li>Each index in the hash table represents a possible hash value where elements are stored based on their computed hash key.</li>
+    <li>When two elements map to the same index, they are linked together using a <strong>linked list</strong>, forming a chain at that position.</li>
+    <li>This chaining mechanism handles collisions efficiently, allowing multiple elements to exist at the same hash index without overwriting each other.</li>
+  </ul>
+  <div class="callout warn">This is why sets give O(1) average-case performance for <code>in</code>, <code>add()</code>, and <code>remove()</code> — the hash table avoids scanning the entire collection.</div>
+
+  <div class="quiz-card" data-ans="3">
+    <div class="quiz-badge">Quiz</div>
+    <div class="quiz-text">How does a Python set handle hash collisions internally?</div>
+    <div class="quiz-options">
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">A</span> Overwrites the existing element</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">B</span> Raises a ValueError</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">C</span> Rehashes into a new table</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">D</span> Chains elements at the same index</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 7. METHODS ========== -->
+<div class="section" id="methods">
+  <div class="section-num">Section 07</div>
+  <h2>Set Methods</h2>
+
+  <p><strong>add()</strong> — inserts a new element. Duplicates are ignored automatically.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre>s = {<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>}
+s.add(<span class="st">"d"</span>)
+<span class="bi">print</span>(s)</pre>
+  </div>
+  <div class="output-block"><div class="output-label">Output</div>{'c', 'd', 'a', 'b'}</div>
+
+  <p><strong>union()</strong> — combines two sets, returning all unique elements.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre>a = {<span class="st">"x"</span>, <span class="st">"y"</span>}
+b = {<span class="st">"y"</span>, <span class="st">"z"</span>}
+<span class="bi">print</span>(a.union(b))</pre>
+  </div>
+  <div class="output-block"><div class="output-label">Output</div>{'z', 'y', 'x'}</div>
+
+  <p><strong>intersection()</strong> — returns elements common to both sets.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre>a = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+b = {<span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>}
+<span class="bi">print</span>(a.intersection(b))</pre>
+  </div>
+  <div class="output-block"><div class="output-label">Output</div>{2, 3}</div>
+
+  <p><strong>difference()</strong> — returns elements in the first set but not in the second.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre>a = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+b = {<span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>}
+<span class="bi">print</span>(a.difference(b))</pre>
+  </div>
+  <div class="output-block"><div class="output-label">Output</div>{1}</div>
+
+  <p><strong>clear()</strong> — removes all elements, leaving an empty set.</p>
+  <div class="code-block">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-label">Python</div></div>
+    <pre>s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s.clear()
+<span class="bi">print</span>(s)</pre>
+  </div>
+  <div class="output-block"><div class="output-label">Output</div>set()</div>
+
+  <div class="quiz-card" data-ans="0">
+    <div class="quiz-badge">Quiz</div>
+    <div class="quiz-text">What does this code print?</div>
+    <div class="quiz-code">a = {1, 2, 3, 4}
+b = {3, 4, 5, 6}
+print(a.union(b).intersection({3, 5, 7}))</div>
+    <div class="quiz-options">
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">A</span> {3, 5}</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">B</span> {3, 4, 5}</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">C</span> {1, 2, 3, 4, 5, 6, 7}</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">D</span> {7}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 8. OPERATORS ========== -->
+<div class="section" id="operators">
+  <div class="section-num">Section 08</div>
+  <h2>Set Operators</h2>
+  <p>Sets and frozen sets support the following operators for comparing and combining:</p>
+
+  <table class="op-table">
+    <thead><tr><th>Operator</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>key in s</td><td>Containment check</td></tr>
+      <tr><td>key not in s</td><td>Non-containment check</td></tr>
+      <tr><td>s1 == s2</td><td>s1 is equivalent to s2</td></tr>
+      <tr><td>s1 != s2</td><td>s1 is not equivalent to s2</td></tr>
+      <tr><td>s1 &lt;= s2</td><td>s1 is subset of s2</td></tr>
+      <tr><td>s1 &lt; s2</td><td>s1 is proper subset of s2</td></tr>
+      <tr><td>s1 &gt;= s2</td><td>s1 is superset of s2</td></tr>
+      <tr><td>s1 &gt; s2</td><td>s1 is proper superset of s2</td></tr>
+      <tr><td>s1 | s2</td><td>Union of s1 and s2</td></tr>
+      <tr><td>s1 &amp; s2</td><td>Intersection of s1 and s2</td></tr>
+      <tr><td>s1 - s2</td><td>Elements in s1 but not in s2</td></tr>
+      <tr><td>s1 ^ s2</td><td>Symmetric difference (elements in exactly one set)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="quiz-card" data-ans="2">
+    <div class="quiz-badge">Quiz</div>
+    <div class="quiz-text">What is the output?</div>
+    <div class="quiz-code">set1 = {0, 2, 4, 6, 8}
+set2 = {1, 2, 3, 4, 5}
+
+print(set1 ^ set2)</div>
+    <div class="quiz-options">
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">A</span> {0, 1, 2, 3, 4, 5, 6, 8}</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">B</span> {2, 4}</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">C</span> {0, 1, 3, 5, 6, 8}</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">D</span> {0, 6, 8}</div>
+    </div>
+  </div>
+
+  <div class="quiz-card" data-ans="1">
+    <div class="quiz-badge">Quiz</div>
+    <div class="quiz-text">What does this expression evaluate to?</div>
+    <div class="quiz-code">{1, 2} < {1, 2, 3}</div>
+    <div class="quiz-options">
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">A</span> False</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">B</span> True</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">C</span> TypeError</div>
+      <div class="q-opt" onclick="selectOpt(this)"><span class="q-letter">D</span> {3}</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .content -->
+
+<!-- Submit / Reset -->
+<div class="submit-bar">
+  <button class="btn btn-primary" id="submitBtn" disabled onclick="submitQuiz()">Submit All Answers</button>
+  <button class="btn btn-outline" onclick="resetQuiz()">Reset Quiz</button>
+</div>
+
+<div class="score-area" id="scoreArea">
+  <div class="score-box">
+    <h3>Your Score</h3>
+    <div class="score-big" id="scoreBig">0 / 0</div>
+    <div class="score-sub" id="scoreSub"></div>
+  </div>
+</div>
+
+<script>
+const quizCards = document.querySelectorAll('.quiz-card');
+const total = quizCards.length;
+let selections = new Array(total).fill(-1);
+let submitted = false;
+
+function selectOpt(el){
+  if(submitted) return;
+  const card = el.closest('.quiz-card');
+  const idx = [...quizCards].indexOf(card);
+  const opts = card.querySelectorAll('.q-opt');
+  const oi = [...opts].indexOf(el);
+  selections[idx] = oi;
+  opts.forEach((o,j) => o.classList.toggle('selected', j===oi));
+  checkReady();
+}
+
+function checkReady(){
+  const answered = selections.filter(s=>s>=0).length;
+  document.getElementById('submitBtn').disabled = answered < total;
+}
+
+function submitQuiz(){
+  if(submitted) return;
+  submitted = true;
+  let score = 0;
+  quizCards.forEach((card,i)=>{
+    const ans = parseInt(card.dataset.ans);
+    const opts = card.querySelectorAll('.q-opt');
+    opts.forEach(o => o.style.pointerEvents='none');
+    if(selections[i] === ans) score++;
+  });
+  const area = document.getElementById('scoreArea');
+  area.style.display = 'block';
+  document.getElementById('scoreBig').textContent = score + ' / ' + total;
+  const pct = Math.round(score/total*100);
+  const msgs = [[90,'Excellent!'],[70,'Good job!'],[50,'Not bad — review the sections you missed.'],[0,'Keep studying — you\'ll get there!']];
+  document.getElementById('scoreSub').textContent = pct + '% — ' + msgs.find(m=>pct>=m[0])[1];
+  area.scrollIntoView({behavior:'smooth',block:'center'});
+  document.getElementById('submitBtn').disabled = true;
+}
+
+function resetQuiz(){
+  submitted = false;
+  selections = new Array(total).fill(-1);
+  quizCards.forEach(card=>{
+    card.querySelectorAll('.q-opt').forEach(o=>{
+      o.classList.remove('selected');
+      o.style.pointerEvents='';
+    });
+  });
+  document.getElementById('scoreArea').style.display='none';
+  document.getElementById('submitBtn').disabled = true;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+
+</body>
+</html>

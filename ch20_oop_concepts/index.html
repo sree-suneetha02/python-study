@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python OOP Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0f1a;
+    --surface: #141829;
+    --surface2: #1a1f36;
+    --border: #262c4a;
+    --text: #e0e4f0;
+    --text-dim: #8890b0;
+    --accent: #6c5ce7;
+    --accent2: #00cec9;
+    --accent3: #fd79a8;
+    --accent4: #fdcb6e;
+    --glow: rgba(108, 92, 231, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    padding: 80px 40px 60px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -20%;
+    width: 140%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 40%, rgba(108,92,231,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(0,206,201,0.08) 0%, transparent 50%);
+    z-index: 0;
+  }
+  .hero-content { position: relative; z-index: 1; }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    background: linear-gradient(135deg, #e0e4f0, #6c5ce7, #00cec9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.78rem;
+    color: var(--accent2);
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* Nav pills */
+  .nav-pills {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 20px 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .nav-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+  .nav-pill:hover, .nav-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108,92,231,0.3);
+  }
+
+  /* Container */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 60px;
+    animation: fadeUp 0.6s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .section-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+  .section p {
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    font-size: 0.98rem;
+  }
+
+  /* Code block */
+  .code-block {
+    background: #0d1017;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin: 20px 0;
+    position: relative;
+  }
+  .code-block .kw { color: #c792ea; }
+  .code-block .fn { color: #82aaff; }
+  .code-block .str { color: #c3e88d; }
+  .code-block .cm { color: #546e7a; }
+  .code-block .self { color: #f07178; }
+  .code-block .param { color: #ffcb6b; }
+  .code-block .call { color: #89ddff; }
+  .code-lang {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    background: var(--surface2);
+    padding: 2px 10px;
+    border-radius: 8px;
+  }
+
+  /* Diagram cards */
+  .diagram-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .diagram-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .diagram-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+
+  /* SVG diagram styles */
+  .diagram-svg {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .feature-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s;
+  }
+  .feature-item:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px var(--glow);
+  }
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+  .fi-1 { background: rgba(108,92,231,0.15); color: var(--accent); }
+  .fi-2 { background: rgba(0,206,201,0.15); color: var(--accent2); }
+  .fi-3 { background: rgba(253,121,168,0.15); color: var(--accent3); }
+  .fi-4 { background: rgba(253,203,110,0.15); color: var(--accent4); }
+  .feature-item h4 {
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    color: #fff;
+  }
+  .feature-item p {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin: 0;
+  }
+
+  /* Bullet list */
+  .info-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+  }
+  .info-list li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 10px;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+  .info-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent2);
+    font-weight: 700;
+  }
+
+  /* Pillar cards */
+  .pillar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    cursor: default;
+  }
+  .pillar-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 30px var(--glow);
+  }
+  .pillar-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .pillar-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .pn-1 { background: rgba(108,92,231,0.2); color: var(--accent); }
+  .pn-2 { background: rgba(0,206,201,0.2); color: var(--accent2); }
+  .pn-3 { background: rgba(253,121,168,0.2); color: var(--accent3); }
+  .pn-4 { background: rgba(253,203,110,0.2); color: var(--accent4); }
+  .pillar-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    color: #fff;
+  }
+  .pillar-card p {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    margin: 0;
+  }
+
+  /* Quiz */
+  .quiz-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .quiz-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent3), var(--accent4), var(--accent2));
+  }
+  .quiz-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .quiz-section > p {
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    font-size: 0.92rem;
+  }
+  .quiz-q {
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .q-num {
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--accent);
+    background: rgba(108,92,231,0.12);
+    padding: 3px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .quiz-q h4 {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 600;
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 8px;
+  }
+  .quiz-opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+  .quiz-opt:hover {
+    border-color: var(--accent);
+    background: rgba(108,92,231,0.06);
+    color: var(--text);
+  }
+  .quiz-opt.selected {
+    border-color: var(--accent);
+    background: rgba(108,92,231,0.1);
+    color: #fff;
+  }
+  .opt-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.78rem;
+    background: var(--border);
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transition: all 0.25s;
+  }
+  .quiz-opt.selected .opt-letter {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 50px 20px 40px; }
+    .container { padding: 0 16px 60px; }
+    .diagram-card, .quiz-section { padding: 20px; }
+    .feature-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="badge">Python · OOP · Guide</div>
+    <h1>Python OOP Concepts</h1>
+    <p>Master Object-Oriented Programming with classes, objects and the four pillars that power scalable applications.</p>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav class="nav-pills">
+  <a href="#classes" class="nav-pill">Classes</a>
+  <a href="#objects" class="nav-pill">Objects</a>
+  <a href="#pillars" class="nav-pill">Four Pillars</a>
+  <a href="#quiz" class="nav-pill">Quiz</a>
+</nav>
+
+<div class="container">
+
+  <!-- What is OOP -->
+  <section class="section">
+    <div class="section-label">Overview</div>
+    <h2>What is OOP?</h2>
+    <p>Object Oriented Programming is a paradigm that organizes code using objects and classes to represent real-world entities. Each object has attributes (data) and methods (actions).</p>
+    <div class="feature-grid">
+      <div class="feature-item">
+        <div class="feature-icon fi-1">{ }</div>
+        <h4>Classes & Objects</h4>
+        <p>Organize code into reusable blueprints and instances.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon fi-2">🔒</div>
+        <h4>Encapsulation</h4>
+        <p>Bundle data and methods together, controlling access.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon fi-3">🧬</div>
+        <h4>Inheritance</h4>
+        <p>Reuse code via parent-child class hierarchies.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon fi-4">◇</div>
+        <h4>Polymorphism</h4>
+        <p>Same interface, different implementations.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Class -->
+  <section id="classes" class="section">
+    <div class="section-label">Concept 01</div>
+    <h2>Class</h2>
+    <p>A class is a blueprint for creating objects. It defines attributes (variables) and methods (functions) that its instances will have.</p>
+    <ul class="info-list">
+      <li>Created using the <code>class</code> keyword</li>
+      <li>Attributes are variables belonging to a class</li>
+      <li>Attributes are public and accessed via the dot (<code>.</code>) operator</li>
+    </ul>
+
+    <div class="diagram-card">
+      <h3>Class Structure Diagram</h3>
+      <svg class="diagram-svg" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- Main class box -->
+        <rect x="180" y="20" width="300" height="280" rx="14" fill="#1a1f36" stroke="#6c5ce7" stroke-width="2"/>
+        <rect x="180" y="20" width="300" height="50" rx="14" fill="#6c5ce7"/>
+        <rect x="180" y="56" width="300" height="14" fill="#6c5ce7"/>
+        <text x="330" y="52" text-anchor="middle" fill="#fff" font-family="DM Sans" font-weight="700" font-size="16">🐕 Class: Dog</text>
+        <!-- Class attribute -->
+        <text x="200" y="100" fill="#00cec9" font-family="JetBrains Mono" font-size="11" font-weight="500">CLASS ATTRIBUTE</text>
+        <rect x="200" y="110" width="260" height="36" rx="8" fill="#0d1017" stroke="#262c4a"/>
+        <text x="214" y="133" fill="#c3e88d" font-family="JetBrains Mono" font-size="12">species = "Canine"</text>
+        <!-- Instance attributes -->
+        <text x="200" y="174" fill="#fd79a8" font-family="JetBrains Mono" font-size="11" font-weight="500">INSTANCE ATTRIBUTES</text>
+        <rect x="200" y="184" width="260" height="36" rx="8" fill="#0d1017" stroke="#262c4a"/>
+        <text x="214" y="207" fill="#ffcb6b" font-family="JetBrains Mono" font-size="12">self.name, self.age</text>
+        <!-- Methods -->
+        <text x="200" y="248" fill="#82aaff" font-family="JetBrains Mono" font-size="11" font-weight="500">METHODS</text>
+        <rect x="200" y="258" width="260" height="30" rx="8" fill="#0d1017" stroke="#262c4a"/>
+        <text x="214" y="278" fill="#89ddff" font-family="JetBrains Mono" font-size="12">__init__(self, name, age)</text>
+        <!-- Arrows from labels -->
+        <line x1="130" y1="128" x2="196" y2="128" stroke="#00cec9" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="30" y="124" fill="#00cec9" font-family="DM Sans" font-size="10" font-weight="600">Shared by</text>
+        <text x="30" y="137" fill="#00cec9" font-family="DM Sans" font-size="10" font-weight="600">all instances</text>
+        <line x1="130" y1="202" x2="196" y2="202" stroke="#fd79a8" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="42" y="198" fill="#fd79a8" font-family="DM Sans" font-size="10" font-weight="600">Unique to</text>
+        <text x="36" y="211" fill="#fd79a8" font-family="DM Sans" font-size="10" font-weight="600">each object</text>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="kw">class</span> <span class="fn">Dog</span>:
+    <span class="param">species</span> = <span class="str">"Canine"</span>  <span class="cm"># Class attribute</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, <span class="param">name</span>, <span class="param">age</span>):
+        <span class="self">self</span>.<span class="param">name</span> = <span class="param">name</span>    <span class="cm"># Instance attribute</span>
+        <span class="self">self</span>.<span class="param">age</span> = <span class="param">age</span>      <span class="cm"># Instance attribute</span>
+    </div>
+  </section>
+
+  <!-- Objects -->
+  <section id="objects" class="section">
+    <div class="section-label">Concept 02</div>
+    <h2>Objects</h2>
+    <p>An object is an instance of a class. It holds its own data and represents a specific entity built from the class blueprint.</p>
+
+    <div class="diagram-card">
+      <h3>Object Instantiation Flow</h3>
+      <svg class="diagram-svg" viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Class box -->
+        <rect x="20" y="50" width="160" height="100" rx="12" fill="#1a1f36" stroke="#6c5ce7" stroke-width="2"/>
+        <text x="100" y="90" text-anchor="middle" fill="#6c5ce7" font-family="DM Sans" font-weight="700" font-size="14">Class: Dog</text>
+        <text x="100" y="115" text-anchor="middle" fill="#546e7a" font-family="DM Sans" font-size="11">(Blueprint)</text>
+        <text x="100" y="135" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="10">species, name, age</text>
+        <!-- Arrow -->
+        <line x1="185" y1="100" x2="260" y2="100" stroke="#6c5ce7" stroke-width="2" marker-end="url(#arrowV)"/>
+        <text x="222" y="90" text-anchor="middle" fill="#c792ea" font-family="JetBrains Mono" font-size="10">Dog()</text>
+        <!-- Object 1 -->
+        <rect x="270" y="20" width="170" height="80" rx="10" fill="#1a1f36" stroke="#00cec9" stroke-width="2"/>
+        <text x="355" y="48" text-anchor="middle" fill="#00cec9" font-family="DM Sans" font-weight="700" font-size="13">dog1</text>
+        <text x="355" y="68" text-anchor="middle" fill="#c3e88d" font-family="JetBrains Mono" font-size="10">name = "Buddy"</text>
+        <text x="355" y="85" text-anchor="middle" fill="#c3e88d" font-family="JetBrains Mono" font-size="10">age = 3</text>
+        <!-- Object 2 -->
+        <rect x="270" y="115" width="170" height="80" rx="10" fill="#1a1f36" stroke="#fd79a8" stroke-width="2"/>
+        <text x="355" y="143" text-anchor="middle" fill="#fd79a8" font-family="DM Sans" font-weight="700" font-size="13">dog2</text>
+        <text x="355" y="163" text-anchor="middle" fill="#c3e88d" font-family="JetBrains Mono" font-size="10">name = "Luna"</text>
+        <text x="355" y="180" text-anchor="middle" fill="#c3e88d" font-family="JetBrains Mono" font-size="10">age = 5</text>
+        <!-- Shared attr -->
+        <rect x="490" y="60" width="150" height="80" rx="10" fill="#1a1f36" stroke="#fdcb6e" stroke-width="1.5" stroke-dasharray="5"/>
+        <text x="565" y="90" text-anchor="middle" fill="#fdcb6e" font-family="DM Sans" font-weight="600" font-size="11">Shared Class Attr</text>
+        <text x="565" y="115" text-anchor="middle" fill="#ffcb6b" font-family="JetBrains Mono" font-size="11">species="Canine"</text>
+        <line x1="443" y1="60" x2="487" y2="85" stroke="#fdcb6e" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="443" y1="155" x2="487" y2="115" stroke="#fdcb6e" stroke-width="1" stroke-dasharray="4"/>
+        <!-- Arrow marker -->
+        <defs>
+          <marker id="arrowV" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#6c5ce7"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <span class="code-lang">Python</span>
+<span class="cm"># Creating objects</span>
+<span class="param">dog1</span> = <span class="fn">Dog</span>(<span class="str">"Buddy"</span>, <span class="param">3</span>)
+<span class="param">dog2</span> = <span class="fn">Dog</span>(<span class="str">"Luna"</span>, <span class="param">5</span>)
+
+<span class="call">print</span>(<span class="param">dog1</span>.<span class="param">name</span>)     <span class="cm"># Buddy</span>
+<span class="call">print</span>(<span class="param">dog1</span>.<span class="param">species</span>)  <span class="cm"># Canine</span>
+<span class="call">print</span>(<span class="param">dog2</span>.<span class="param">name</span>)     <span class="cm"># Luna</span>
+    </div>
+
+    <ul class="info-list">
+      <li><strong>State</strong> — represented by attributes, reflects object properties</li>
+      <li><strong>Behavior</strong> — represented by methods, reflects responses to other objects</li>
+      <li><strong>Identity</strong> — gives a unique name enabling interaction between objects</li>
+    </ul>
+  </section>
+
+  <!-- Four Pillars -->
+  <section id="pillars" class="section">
+    <div class="section-label">Core Principles</div>
+    <h2>Four Pillars of OOP</h2>
+    <p>These pillars form the foundation for designing structured, reusable, and maintainable software.</p>
+
+    <div class="diagram-card">
+      <h3>The Four Pillars</h3>
+      <svg class="diagram-svg" viewBox="0 0 660 300" xmlns="http://www.w3.org/2000/svg">
+        <!-- Central OOP circle -->
+        <circle cx="330" cy="150" r="50" fill="#1a1f36" stroke="#6c5ce7" stroke-width="2.5"/>
+        <text x="330" y="145" text-anchor="middle" fill="#fff" font-family="DM Serif Display" font-size="16">OOP</text>
+        <text x="330" y="163" text-anchor="middle" fill="#8890b0" font-family="DM Sans" font-size="9">Python</text>
+        <!-- Inheritance -->
+        <line x1="280" y1="130" x2="140" y2="65" stroke="#6c5ce7" stroke-width="1.5"/>
+        <rect x="30" y="30" width="160" height="70" rx="12" fill="#1a1f36" stroke="#6c5ce7" stroke-width="2"/>
+        <text x="110" y="60" text-anchor="middle" fill="#6c5ce7" font-family="DM Sans" font-weight="700" font-size="13">🧬 Inheritance</text>
+        <text x="110" y="82" text-anchor="middle" fill="#8890b0" font-family="DM Sans" font-size="10">Reuse via parent-child</text>
+        <!-- Polymorphism -->
+        <rect x="470" y="30" width="170" height="70" rx="12" fill="#1a1f36" stroke="#00cec9" stroke-width="2"/>
+        <line x1="380" y1="130" x2="510" y2="65" stroke="#00cec9" stroke-width="1.5"/>
+        <text x="555" y="60" text-anchor="middle" fill="#00cec9" font-family="DM Sans" font-weight="700" font-size="13">◇ Polymorphism</text>
+        <text x="555" y="82" text-anchor="middle" fill="#8890b0" font-family="DM Sans" font-size="10">Many forms, one interface</text>
+        <!-- Encapsulation -->
+        <rect x="30" y="200" width="160" height="70" rx="12" fill="#1a1f36" stroke="#fd79a8" stroke-width="2"/>
+        <line x1="285" y1="175" x2="145" y2="235" stroke="#fd79a8" stroke-width="1.5"/>
+        <text x="110" y="230" text-anchor="middle" fill="#fd79a8" font-family="DM Sans" font-weight="700" font-size="13">🔒 Encapsulation</text>
+        <text x="110" y="252" text-anchor="middle" fill="#8890b0" font-family="DM Sans" font-size="10">Bundle & protect data</text>
+        <!-- Abstraction -->
+        <rect x="470" y="200" width="170" height="70" rx="12" fill="#1a1f36" stroke="#fdcb6e" stroke-width="2"/>
+        <line x1="375" y1="175" x2="510" y2="235" stroke="#fdcb6e" stroke-width="1.5"/>
+        <text x="555" y="230" text-anchor="middle" fill="#fdcb6e" font-family="DM Sans" font-weight="700" font-size="13">🎭 Abstraction</text>
+        <text x="555" y="252" text-anchor="middle" fill="#8890b0" font-family="DM Sans" font-size="10">Hide complexity, show API</text>
+      </svg>
+    </div>
+
+    <!-- Pillar detail cards -->
+    <div class="pillar-card">
+      <div class="pillar-header">
+        <div class="pillar-num pn-1">01</div>
+        <h3>Inheritance</h3>
+      </div>
+      <p>Allows a child class to acquire properties and methods from a parent class. This supports hierarchical classification and promotes code reuse, letting you build specialized classes on top of general ones.</p>
+    </div>
+
+    <div class="pillar-card">
+      <div class="pillar-header">
+        <div class="pillar-num pn-2">02</div>
+        <h3>Polymorphism</h3>
+      </div>
+      <p>Means "same operation, different behavior." Functions or methods with the same name can work differently depending on the type of object they act upon — enabling flexible, interchangeable implementations.</p>
+    </div>
+
+    <div class="pillar-card">
+      <div class="pillar-header">
+        <div class="pillar-num pn-3">03</div>
+        <h3>Encapsulation</h3>
+      </div>
+      <p>The bundling of data (attributes) and methods (functions) within a class, restricting access to some components to control interactions and protect internal state from unintended modification.</p>
+    </div>
+
+    <div class="pillar-card">
+      <div class="pillar-header">
+        <div class="pillar-num pn-4">04</div>
+        <h3>Data Abstraction</h3>
+      </div>
+      <p>Hides internal implementation details while exposing only the necessary functionality. It helps you focus on "what to do" rather than "how to do it," simplifying complex systems.</p>
+    </div>
+  </section>
+
+  <!-- Quiz -->
+  <section id="quiz" class="section">
+    <div class="quiz-section">
+      <h2>Test Your Knowledge</h2>
+      <p>Select the answer you think is correct — answers are not revealed here. Use this to self-assess!</p>
+
+      <!-- Q1 -->
+      <div class="quiz-q">
+        <div class="quiz-q-header">
+          <span class="q-num">Q1</span>
+          <h4>What is a class in Object-Oriented Programming?</h4>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">A</span> A function that returns values</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">B</span> A module containing utilities</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">C</span> A blueprint for creating objects</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">D</span> A type of loop structure</div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="quiz-q">
+        <div class="quiz-q-header">
+          <span class="q-num">Q2</span>
+          <h4>What does the <code>__init__</code> method do in a Python class?</h4>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">A</span> Deletes the object from memory</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">B</span> Initializes object data when created</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">C</span> Imports external modules</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">D</span> Defines a static method</div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-q">
+        <div class="quiz-q-header">
+          <span class="q-num">Q3</span>
+          <h4>Which OOP pillar bundles data and methods together while restricting access?</h4>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">A</span> Inheritance</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">B</span> Polymorphism</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">C</span> Abstraction</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">D</span> Encapsulation</div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="quiz-q">
+        <div class="quiz-q-header">
+          <span class="q-num">Q4</span>
+          <h4>What does <code>self</code> refer to inside a Python class?</h4>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">A</span> The parent class</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">B</span> The current instance of the class</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">C</span> A global variable</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">D</span> The class constructor</div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="quiz-q">
+        <div class="quiz-q-header">
+          <span class="q-num">Q5</span>
+          <h4>What is the difference between a class attribute and an instance attribute?</h4>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">A</span> Class attributes are private; instance attributes are public</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">B</span> Class attributes are shared across all instances; instance attributes are unique per object</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">C</span> They are the same thing</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">D</span> Instance attributes cannot be modified</div>
+        </div>
+      </div>
+
+      <!-- Q6 (new) -->
+      <div class="quiz-q">
+        <div class="quiz-q-header">
+          <span class="q-num">Q6</span>
+          <h4>Which of the following best describes Polymorphism?</h4>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">A</span> Hiding implementation details from the user</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">B</span> A child class inheriting from multiple parents</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">C</span> Same method name behaving differently for different object types</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">D</span> Restricting access to certain methods</div>
+        </div>
+      </div>
+
+      <!-- Q7 (new) -->
+      <div class="quiz-q">
+        <div class="quiz-q-header">
+          <span class="q-num">Q7</span>
+          <h4>Which keyword is used to inherit from a parent class in Python?</h4>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">A</span> <code>extends</code></div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">B</span> <code>inherits</code></div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">C</span> Parent class name in parentheses after the class name</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">D</span> <code>super</code> keyword only</div>
+        </div>
+      </div>
+
+      <!-- Q8 (new) -->
+      <div class="quiz-q">
+        <div class="quiz-q-header">
+          <span class="q-num">Q8</span>
+          <h4>What is the purpose of Data Abstraction in OOP?</h4>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">A</span> To make all data public and accessible</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">B</span> To expose only necessary functionality while hiding internal details</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">C</span> To delete unused objects from memory</div>
+          <div class="quiz-opt" onclick="toggleOpt(this)"><span class="opt-letter">D</span> To prevent creating multiple instances of a class</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">Python OOP Concepts · Interactive Study Guide</div>
+
+<script>
+  function toggleOpt(el) {
+    const siblings = el.parentElement.querySelectorAll('.quiz-opt');
+    siblings.forEach(s => s.classList.remove('selected'));
+    el.classList.toggle('selected');
+  }
+
+  // Smooth scroll for nav
+  document.querySelectorAll('.nav-pill').forEach(pill => {
+    pill.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Animate sections on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.animationPlayState = 'running';
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.section').forEach(s => {
+    s.style.animationPlayState = 'paused';
+    observer.observe(s);
+  });
+</script>
+
+</body>
+</html>

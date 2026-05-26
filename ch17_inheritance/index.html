@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 17 — Inheritance</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e1117;
+  --surface: #161b22;
+  --surface2: #1c2333;
+  --border: #2a3040;
+  --text: #c9d1d9;
+  --text-muted: #8b949e;
+  --heading: #e6edf3;
+  --accent: #e8a44a;
+  --accent2: #c2785c;
+  --accent3: #6db88f;
+  --accent4: #7aa2f7;
+  --code-bg: #1a1f2b;
+  --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --question-bg: #1a2332;
+  --question-border: #2d4a6f;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+/* Decorative background */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(232,164,74,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(122,162,247,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(109,184,143,0.02) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.container {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 3rem 2rem 6rem;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 4rem 2rem;
+  position: relative;
+}
+.hero::after {
+  content: '♠ ♥ ♦ ♣';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.4rem;
+  letter-spacing: 1.2rem;
+  color: var(--accent);
+  opacity: 0.35;
+}
+.hero .chapter-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem;
+  color: var(--heading);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+.hero .subtitle {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* TOC */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  margin-bottom: 4rem;
+  box-shadow: var(--card-shadow);
+}
+.toc h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--accent);
+  margin-bottom: 1.2rem;
+}
+.toc ul {
+  list-style: none;
+  columns: 2;
+  column-gap: 2rem;
+}
+.toc li {
+  margin-bottom: 0.5rem;
+}
+.toc a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--accent); }
+.toc a .num { color: var(--accent4); margin-right: 0.5rem; font-family: 'Source Code Pro', monospace; font-size: 0.85rem; }
+
+/* Sections */
+.section {
+  margin-bottom: 3.5rem;
+  animation: fadeUp 0.5s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-num {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.9rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--heading);
+  font-weight: 700;
+}
+.section p {
+  margin-bottom: 1rem;
+  font-size: 1.02rem;
+}
+
+/* Code blocks */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  overflow-x: auto;
+  margin: 1.2rem 0;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: #a9b7c6;
+}
+code {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  padding: 0.15em 0.45em;
+  border-radius: 4px;
+  color: var(--accent4);
+}
+
+/* Tables */
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.2rem 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+}
+th {
+  background: var(--surface2);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.8rem 1.2rem;
+  text-align: left;
+}
+td {
+  padding: 0.65rem 1.2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+tr:hover td { background: rgba(232,164,74,0.04); }
+
+/* Key concept callouts */
+.callout {
+  background: var(--surface);
+  border-left: 4px solid var(--accent3);
+  border-radius: 0 8px 8px 0;
+  padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0;
+}
+.callout strong { color: var(--accent3); }
+
+/* Glossary */
+.glossary-item {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.glossary-term {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 140px;
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+.glossary-def {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Questions */
+.question-block {
+  background: var(--question-bg);
+  border: 1px solid var(--question-border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1.5rem 0;
+  position: relative;
+}
+.question-block::before {
+  content: 'Q';
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  background: var(--accent4);
+  color: var(--bg);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.question-block .q-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent4);
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+.question-block p {
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.question-block pre {
+  margin-top: 0.8rem;
+}
+
+.new-badge {
+  display: inline-block;
+  background: var(--accent2);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Diagram */
+.diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+}
+.diagram-box {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8rem 2rem;
+  text-align: center;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.9rem;
+  color: var(--heading);
+  min-width: 180px;
+}
+.diagram-box.parent { border-color: var(--accent); }
+.diagram-box.child { border-color: var(--accent3); }
+.diagram-box.grandchild { border-color: var(--accent4); }
+.diagram-arrow {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .hero h1 { font-size: 2.2rem; }
+  .toc ul { columns: 1; }
+  .glossary-item { flex-direction: column; gap: 0.3rem; }
+  .glossary-term { min-width: auto; }
+  .container { padding: 2rem 1rem 4rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="chapter-label">Chapter 17</div>
+    <h1>Inheritance</h1>
+    <p class="subtitle">Classes that build on other classes — representing cards, decks, and poker hands in Python.</p>
+  </div>
+
+  <!-- Table of Contents -->
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ul>
+      <li><a href="#s1"><span class="num">17.1</span> Representing Cards</a></li>
+      <li><a href="#s2"><span class="num">17.2</span> Card Attributes</a></li>
+      <li><a href="#s3"><span class="num">17.3</span> Printing Cards</a></li>
+      <li><a href="#s4"><span class="num">17.4</span> Comparing Cards</a></li>
+      <li><a href="#s5"><span class="num">17.5</span> Decks</a></li>
+      <li><a href="#s6"><span class="num">17.6</span> Printing the Deck</a></li>
+      <li><a href="#s7"><span class="num">17.7</span> Add, Remove, Shuffle &amp; Sort</a></li>
+      <li><a href="#s8"><span class="num">17.8</span> Parents and Children</a></li>
+      <li><a href="#s9"><span class="num">17.9</span> Specialization</a></li>
+      <li><a href="#s10"><span class="num">17.10</span> Debugging</a></li>
+      <li><a href="#glossary"><span class="num">17.11</span> Glossary</a></li>
+      <li><a href="#exercises"><span class="num">17.12</span> Exercises</a></li>
+    </ul>
+  </nav>
+
+  <!-- 17.1 -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <span class="section-num">17.1</span>
+      <h2>Representing Cards</h2>
+    </div>
+    <p>A standard deck has 52 cards — four suits (Spades, Hearts, Diamonds, Clubs) and thirteen ranks (Ace through King). To make cards easy to compare, we encode suits and ranks as integers.</p>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Suit</th><th>Code</th></tr>
+        <tr><td>Clubs</td><td>0</td></tr>
+        <tr><td>Diamonds</td><td>1</td></tr>
+        <tr><td>Hearts</td><td>2</td></tr>
+        <tr><td>Spades</td><td>3</td></tr>
+      </table>
+    </div>
+
+    <p>Face-card ranks are encoded as Jack&nbsp;=&nbsp;11, Queen&nbsp;=&nbsp;12, King&nbsp;=&nbsp;13, and Ace can be 1 (low) or 14 (high). Two lists of strings serve as look-up tables:</p>
+
+<pre>class Card:
+    """Represents a standard playing card."""
+
+    suit_names = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+    rank_names = [None, 'Ace', '2', '3', '4', '5', '6', '7',
+                  '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']</pre>
+
+    <div class="callout">
+      <strong>Key idea:</strong> <code>suit_names</code> and <code>rank_names</code> are <em>class variables</em> — shared by every Card instance, accessed via <code>Card.suit_names</code>.
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>Why does <code>rank_names</code> start with <code>None</code> at index 0? What would go wrong if we removed it?</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>If you wanted to support a Joker card (no suit, rank&nbsp;=&nbsp;0), how would you modify <code>suit_names</code>, <code>rank_names</code>, and the encoding scheme?</p>
+    </div>
+  </div>
+
+  <!-- 17.2 -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <span class="section-num">17.2</span>
+      <h2>Card Attributes</h2>
+    </div>
+    <p>The <code>__init__</code> method stores integer suit and rank as instance attributes:</p>
+<pre>def __init__(self, suit, rank):
+    self.suit = suit
+    self.rank = rank</pre>
+    <p>Creating and inspecting a card:</p>
+<pre>queen = Card(1, 12)
+queen.suit, queen.rank   # (1, 12)</pre>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>What is the difference between accessing <code>queen.suit_names</code> and <code>Card.suit_names</code>? Do they return different objects? Why might one form be preferred?</p>
+    </div>
+  </div>
+
+  <!-- 17.3 -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <span class="section-num">17.3</span>
+      <h2>Printing Cards</h2>
+    </div>
+    <p>A <code>__str__</code> method translates integer codes back to human-readable names using the class variables:</p>
+<pre>def __str__(self):
+    rank_name = Card.rank_names[self.rank]
+    suit_name = Card.suit_names[self.suit]
+    return f'{rank_name} of {suit_name}'</pre>
+<pre>print(queen)   # Queen of Diamonds</pre>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>Write a <code>__repr__</code> method for <code>Card</code> that returns a string like <code>Card(1, 12)</code> — the form you would type to re-create the object. How does <code>__repr__</code> differ from <code>__str__</code> in purpose?</p>
+    </div>
+  </div>
+
+  <!-- 17.4 -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <span class="section-num">17.4</span>
+      <h2>Comparing Cards</h2>
+    </div>
+    <p>By default, <code>==</code> checks identity (same object). We override this with <code>__eq__</code> to check equivalence:</p>
+<pre>def __eq__(self, other):
+    return self.suit == other.suit and self.rank == other.rank</pre>
+    <p>For ordering, a helper converts a card to a tuple <code>(suit, rank)</code>, and <code>__lt__</code> compares those tuples:</p>
+<pre>def to_tuple(self):
+    return (self.suit, self.rank)
+
+def __lt__(self, other):
+    return self.to_tuple() &lt; other.to_tuple()</pre>
+    <div class="callout">
+      <strong>Totally ordered:</strong> With <code>__eq__</code>, <code>__lt__</code>, and <code>__le__</code> defined consistently, any two cards can be compared — and a list of cards can be sorted.
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>Python's <code>functools.total_ordering</code> decorator lets you define just <code>__eq__</code> and one of <code>__lt__</code>, <code>__le__</code>, <code>__gt__</code>, <code>__ge__</code>, and it fills in the rest. Rewrite the Card comparison using <code>@total_ordering</code>. What are the pros and cons?</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>What happens if you call <code>Card(1, 12) == "Queen of Diamonds"</code>? Will it raise an error, return <code>False</code>, or something else? How would you make <code>__eq__</code> safer for mixed-type comparisons?</p>
+    </div>
+  </div>
+
+  <!-- 17.5 -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <span class="section-num">17.5</span>
+      <h2>Decks</h2>
+    </div>
+    <p>A <code>Deck</code> wraps a list of <code>Card</code> objects. A static method generates all 52 cards:</p>
+<pre>class Deck:
+    def __init__(self, cards):
+        self.cards = cards
+
+    @staticmethod
+    def make_cards():
+        cards = []
+        for suit in range(4):
+            for rank in range(2, 15):
+                cards.append(Card(suit, rank))
+        return cards</pre>
+<pre>deck = Deck(Deck.make_cards())
+len(deck.cards)   # 52</pre>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>Rewrite <code>make_cards</code> as a one-line list comprehension. Which version do you find more readable, and why?</p>
+    </div>
+  </div>
+
+  <!-- 17.6 -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <span class="section-num">17.6</span>
+      <h2>Printing the Deck</h2>
+    </div>
+    <p>The <code>__str__</code> method builds a list of individual card strings and joins them with newlines — more efficient than repeated string concatenation:</p>
+<pre>def __str__(self):
+    res = []
+    for card in self.cards:
+        res.append(str(card))
+    return '\n'.join(res)</pre>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>Write a <code>__len__</code> method for <code>Deck</code> so that <code>len(deck)</code> works directly instead of <code>len(deck.cards)</code>. What other dunder methods would make <code>Deck</code> behave more like a built-in collection?</p>
+    </div>
+  </div>
+
+  <!-- 17.7 -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <span class="section-num">17.7</span>
+      <h2>Add, Remove, Shuffle &amp; Sort</h2>
+    </div>
+    <p>Thin wrappers around list methods:</p>
+<pre>def take_card(self):
+    return self.cards.pop()
+
+def put_card(self, card):
+    self.cards.append(card)
+
+def shuffle(self):
+    random.shuffle(self.cards)
+
+def sort(self):
+    self.cards.sort()</pre>
+    <div class="callout">
+      <strong>Delegation:</strong> <code>Deck.sort</code> simply calls <code>list.sort</code>, which in turn uses the <code>__lt__</code> method on <code>Card</code>.
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p><code>take_card</code> always pops from the end. Write a method <code>deal(n)</code> that removes and returns the top <code>n</code> cards as a list. What should happen if <code>n</code> is larger than the number of cards left?</p>
+    </div>
+  </div>
+
+  <!-- 17.8 -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <span class="section-num">17.8</span>
+      <h2>Parents and Children</h2>
+    </div>
+    <p>A <code>Hand</code> inherits from <code>Deck</code> — it reuses <code>take_card</code>, <code>put_card</code>, <code>shuffle</code>, and <code>sort</code>, but overrides <code>__init__</code> to start with an empty list and a label:</p>
+<pre>class Hand(Deck):
+    def __init__(self, label=''):
+        self.label = label
+        self.cards = []</pre>
+    <p><code>move_cards</code> is a polymorphic method that works between any combination of Deck and Hand objects:</p>
+<pre>def move_cards(self, other, num):
+    for i in range(num):
+        card = self.take_card()
+        other.put_card(card)</pre>
+
+    <!-- Inheritance diagram -->
+    <div class="diagram">
+      <div class="diagram-box parent">Deck <span style="color:var(--text-muted); font-size:0.8rem;">(parent)</span></div>
+      <div class="diagram-arrow">↓ inherits</div>
+      <div class="diagram-box child">Hand <span style="color:var(--text-muted); font-size:0.8rem;">(child)</span></div>
+      <div class="diagram-arrow">↓ inherits</div>
+      <div class="diagram-box grandchild">BridgeHand / PokerHand <span style="color:var(--text-muted); font-size:0.8rem;">(grandchild)</span></div>
+    </div>
+
+    <div class="callout">
+      <strong>Liskov Substitution Principle:</strong> Any code that works with a <code>Deck</code> should also work with a <code>Hand</code>. Child classes must honour the parent's interface.
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>Does <code>Hand.__init__</code> call <code>Deck.__init__</code>? Should it? Rewrite <code>Hand.__init__</code> using <code>super().__init__(...)</code> and explain the trade-offs.</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>Give an example where the Liskov Substitution Principle is violated. What kind of bug would this cause at runtime?</p>
+    </div>
+  </div>
+
+  <!-- 17.9 -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <span class="section-num">17.9</span>
+      <h2>Specialization</h2>
+    </div>
+    <p><code>BridgeHand</code> extends <code>Hand</code> with a scoring method specific to bridge:</p>
+<pre>class BridgeHand(Hand):
+    hcp_dict = {'Ace': 4, 'King': 3, 'Queen': 2, 'Jack': 1}
+
+    def high_card_point_count(self):
+        count = 0
+        for card in self.cards:
+            rank_name = Card.rank_names[card.rank]
+            count += BridgeHand.hcp_dict.get(rank_name, 0)
+        return count</pre>
+    <p>This is <em>specialization</em> — adding domain-specific behaviour while reusing the general-purpose base.</p>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>Design a <code>BlackjackHand</code> class that inherits from <code>Hand</code>. Implement a <code>score()</code> method that calculates the total value of the hand (number cards at face value, face cards worth 10, Ace worth 11 or 1 to avoid busting over 21).</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>What does "favor composition over inheritance" mean? Sketch an alternative design where <code>Hand</code> contains a <code>Deck</code> instead of inheriting from it. What are the advantages?</p>
+    </div>
+  </div>
+
+  <!-- 17.10 -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <span class="section-num">17.10</span>
+      <h2>Debugging</h2>
+    </div>
+    <p>Inheritance can scatter method definitions across multiple classes. To trace where a method is defined, use MRO:</p>
+<pre>def find_defining_class(obj, method_name):
+    for typ in type(obj).mro():
+        if method_name in vars(typ):
+            return typ
+    return f'Method {method_name} not found.'</pre>
+<pre>find_defining_class(hand, 'shuffle')
+# &lt;class '__main__.Deck'&gt;</pre>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>If <code>BridgeHand</code> defined its own <code>shuffle</code> method, what would <code>find_defining_class(bridge_hand, 'shuffle')</code> return? Explain how Python's MRO resolves the name.</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Practice Question <span class="new-badge">New</span></div>
+      <p>Python supports multiple inheritance: <code>class C(A, B)</code>. If both <code>A</code> and <code>B</code> define a method called <code>play</code>, which one does <code>C</code> use? What algorithm does Python use to decide?</p>
+    </div>
+  </div>
+
+  <!-- Glossary -->
+  <div class="section" id="glossary">
+    <div class="section-header">
+      <span class="section-num">17.11</span>
+      <h2>Glossary</h2>
+    </div>
+
+    <div class="glossary-item">
+      <span class="glossary-term">Inheritance</span>
+      <span class="glossary-def">Defining a new class as a modified version of an existing class.</span>
+    </div>
+    <div class="glossary-item">
+      <span class="glossary-term">Encode</span>
+      <span class="glossary-def">Mapping one set of values to another (e.g., suits → integers).</span>
+    </div>
+    <div class="glossary-item">
+      <span class="glossary-term">Class Variable</span>
+      <span class="glossary-def">A variable defined inside a class but outside any method; shared by all instances.</span>
+    </div>
+    <div class="glossary-item">
+      <span class="glossary-term">Totally Ordered</span>
+      <span class="glossary-def">Any two elements can be compared, and results are consistent.</span>
+    </div>
+    <div class="glossary-item">
+      <span class="glossary-term">Delegation</span>
+      <span class="glossary-def">When a method passes responsibility to another method to do the work.</span>
+    </div>
+    <div class="glossary-item">
+      <span class="glossary-term">Parent Class</span>
+      <span class="glossary-def">The class being inherited from.</span>
+    </div>
+    <div class="glossary-item">
+      <span class="glossary-term">Child Class</span>
+      <span class="glossary-def">The class that inherits from another class.</span>
+    </div>
+    <div class="glossary-item">
+      <span class="glossary-term">Specialization</span>
+      <span class="glossary-def">Using inheritance to create a class tailored for a specific use.</span>
+    </div>
+  </div>
+
+  <!-- Exercises -->
+  <div class="section" id="exercises">
+    <div class="section-header">
+      <span class="section-num">17.12</span>
+      <h2>Exercises</h2>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 1 — Trick Winner</div>
+      <p>Write a <code>Trick.find_winner</code> method for contract bridge. The first card played determines the "led suit." Only cards of that suit can win. Return the index of the winning card.</p>
+<pre>cards = [Card(1, 3), Card(1, 10),
+         Card(1, 12), Card(2, 13)]
+trick = Trick(cards)
+trick.find_winner()   # should return 2</pre>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 2 — Flush</div>
+      <p>Write <code>PokerHand.has_flush()</code> that returns <code>True</code> if the hand has five or more cards of the same suit. Use <code>get_suit_counts()</code>.</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 3 — Straight</div>
+      <p>Write <code>PokerHand.has_straight()</code>. Five consecutive ranks form a straight. Ace can be low (A-2-3-4-5) or high (10-J-Q-K-A) but cannot wrap around (K-A-2-3-4 is not a straight).</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 4 — Straight Flush</div>
+      <p>Write <code>PokerHand.has_straight_flush()</code>. Five cards that are both a straight <em>and</em> a flush — same suit, consecutive ranks.</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 5 — Pair</div>
+      <p>Write <code>PokerHand.has_pair()</code> — returns <code>True</code> if two or more cards share the same rank.</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 6 — Full House</div>
+      <p>Write <code>PokerHand.has_full_house()</code> — three cards of one rank and two of another.</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 7 — Kangaroo Bug <span class="new-badge">New</span></div>
+      <p>The <code>Kangaroo</code> class below has a subtle bug with mutable default arguments. Identify the bug and rewrite <code>__init__</code> to fix it.</p>
+<pre>class Kangaroo:
+    def __init__(self, name, contents=[]):
+        self.name = name
+        self.contents = contents
+
+    def put_in_pouch(self, item):
+        self.contents.append(item)</pre>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 8 <span class="new-badge">New</span></div>
+      <p>Write a <code>PokerHand.has_two_pair()</code> method that returns <code>True</code> if the hand contains two distinct pairs (e.g., two 7s and two Jacks).</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 9 <span class="new-badge">New</span></div>
+      <p>Write a <code>PokerHand.classify()</code> method that returns a string describing the best hand: <code>"straight flush"</code>, <code>"full house"</code>, <code>"flush"</code>, <code>"straight"</code>, <code>"two pair"</code>, <code>"pair"</code>, or <code>"high card"</code>. Poker hand rankings go from highest to lowest in that order.</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 10 <span class="new-badge">New</span></div>
+      <p>Write a simulation that deals 10,000 random five-card poker hands and counts how often each classification appears. Print the estimated probability of each hand type. Does your result roughly match known poker probabilities?</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 11 <span class="new-badge">New</span></div>
+      <p>Add a <code>__hash__</code> method to <code>Card</code> so that Card objects can be used as dictionary keys or added to sets. Why is it important that <code>__hash__</code> and <code>__eq__</code> are consistent?</p>
+    </div>
+
+    <div class="question-block">
+      <div class="q-label">Exercise 12 <span class="new-badge">New</span></div>
+      <p>Implement a <code>__contains__</code> method on <code>Deck</code> so that <code>Card(1, 12) in deck</code> returns <code>True</code> or <code>False</code>. Then implement <code>__iter__</code> so you can write <code>for card in deck:</code> directly.</p>
+    </div>
+  </div>
+
+  <footer>
+    Chapter 17 — Inheritance &nbsp;|&nbsp; Think Python Study Guide
+  </footer>
+
+</div>
+
+</body>
+</html>
